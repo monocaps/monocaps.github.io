@@ -622,5 +622,4 @@ html:not(.js) .portada__frase, html:not(.js) .portada__sub, html:not(.js) .porta
 
 /* pausa durante el salto del desfile: corta el impulso del scroll */
 html { scrollbar-gutter: stable; }
-html.pausa, html.pausa body { overflow: hidden; touch-action: none; }
 

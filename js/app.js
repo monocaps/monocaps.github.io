@@ -213,14 +213,30 @@
     pausar(df.top + (i + 0.2) * df.paso);
     requestAnimationFrame(animarSalto);
   }
+  // Pausa sin bloquear la página (overflow: hidden soltaba la escena fija en el celular):
+  // durante el salto se ignoran los deslizamientos y, cuadro a cuadro, el scroll vuelve a su
+  // sitio, lo que corta el impulso que trae el dedo.
   function pausar(y) {
-    var raiz = document.documentElement;
-    raiz.classList.add('pausa');
+    df.pausaY = y;
+    df.pausaHasta = performance.now() + DURACION + 120;
     window.scrollTo({ top: y, behavior: 'instant' });
     df.antesY = y;
-    clearTimeout(df.desbloqueo);
-    df.desbloqueo = setTimeout(function () { raiz.classList.remove('pausa'); }, DURACION + 80);
+    if (!df.sosteniendo) {
+      df.sosteniendo = true;
+      requestAnimationFrame(function sostener(ahora) {
+        if (ahora > df.pausaHasta) { df.sosteniendo = false; return; }
+        if (Math.abs(window.scrollY - df.pausaY) > 1) {
+          window.scrollTo({ top: df.pausaY, behavior: 'instant' });
+          df.antesY = df.pausaY;
+        }
+        requestAnimationFrame(sostener);
+      });
+    }
   }
+  function enPausa() { return df.pausaHasta && performance.now() < df.pausaHasta; }
+  ['wheel', 'touchmove'].forEach(function (tipo) {
+    window.addEventListener(tipo, function (e) { if (enPausa() && e.cancelable) e.preventDefault(); }, { passive: false });
+  });
   function animarSalto(ahora) {
     var s = df.salto;
     if (!s) return;
