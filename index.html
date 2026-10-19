@@ -60,8 +60,7 @@
           <img class="portada__foto" src="img/portada/portada.webp" alt="Seis gorras sobre una moto en un mirador de noche, con las luces de la ciudad al fondo" width="1200" height="1600" fetchpriority="high">
         </picture>
         <h1 class="portada__titulo">
-          <span class="linea l1"><span>MONO</span></span>
-          <span class="linea l2"><span>CAPS</span></span>
+          <span class="linea"><span>MONO</span> <span>CAPS</span></span>
         </h1>
         <picture>
           <source media="(max-width: 600px)" srcset="img/portada/portada-gorra-sm.webp">
@@ -88,8 +87,11 @@
         <p class="vitrina__contador" aria-live="polite"><span data-v-actual>01</span> / <span data-v-total>11</span></p>
       </div>
       <div class="vitrina__escena" data-v-escena>
-        <canvas class="burbuja vitrina__burbuja" data-burbuja="vitrina" aria-hidden="true"></canvas>
-        <img class="vitrina__gorra" data-v-img alt="">
+        <div class="flota" data-v-flota>
+          <canvas class="burbuja" data-burbuja="vitrina" aria-hidden="true"></canvas>
+          <img class="flota__gorra" data-v-img alt="">
+          <canvas class="burbuja burbuja--frente" data-burbuja-frente="vitrina" aria-hidden="true"></canvas>
+        </div>
         <button class="vitrina__flecha prev" data-v-prev aria-label="Gorra anterior">←</button>
         <button class="vitrina__flecha next" data-v-next aria-label="Gorra siguiente">→</button>
       </div>
@@ -203,6 +205,7 @@
       <div class="detalle__galeria" data-panel="producto">
         <canvas class="burbuja detalle__burbuja" data-burbuja="detalle" aria-hidden="true"></canvas>
         <div class="carril" data-d-carril></div>
+        <canvas class="burbuja burbuja--frente detalle__burbuja" data-burbuja-frente="detalle" aria-hidden="true"></canvas>
         <p class="carril__indice" data-d-indice></p>
       </div>
       <div class="detalle__reales" data-panel="real" hidden>

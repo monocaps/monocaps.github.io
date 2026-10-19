@@ -108,35 +108,66 @@
     $('[data-anio]').textContent = new Date().getFullYear();
   }
 
-  /* ---------- vitrina: la burbuja grande ---------- */
-  var vitrina = { i: 0, timer: null, pausa: 0 };
+  /* ---------- vitrina: la burbuja grande que sigue el dedo ---------- */
+  var vitrina = { i: 0, timer: null, pausa: 0, ocupada: false };
   function montarVitrina() {
     var lista = gorras.filter(sePuedePedir);
     if (!lista.length) { $('.vitrina').hidden = true; return; }
     vitrina.lista = lista;
-    vitrina.burbuja = window.Burbujas.registrar($('[data-burbuja="vitrina"]'), { semilla: 2.4, prioridad: true });
+    vitrina.flota = $('[data-v-flota]');
+    vitrina.burbuja = window.Burbujas.registrar($('[data-burbuja="vitrina"]'), {
+      frente: $('[data-burbuja-frente="vitrina"]'), semilla: 2.4, prioridad: true, sensible: 0.6
+    });
     $('[data-v-total]').textContent = String(lista.length).padStart(2, '0');
-    mostrarVitrina(0, true);
+    mostrarVitrina(0, 0);
 
     $('[data-v-prev]').addEventListener('click', function () { tocarVitrina(-1); });
     $('[data-v-next]').addEventListener('click', function () { tocarVitrina(1); });
 
-    var escena = $('[data-v-escena]'), x0 = null, y0 = 0;
+    // arrastre: la burbuja sigue el dedo, se estira como líquido y al soltar sale hacia ese lado
+    var escena = $('[data-v-escena]'), flota = vitrina.flota;
+    var arr = null;
     escena.addEventListener('pointerdown', function (e) {
-      if (e.target.closest('button')) return;
-      x0 = e.clientX; y0 = e.clientY;
+      if (e.target.closest('button') || vitrina.ocupada) return;
+      arr = { x0: e.clientX, y0: e.clientY, x: e.clientX, vx: 0, decidido: false, horizontal: false, id: e.pointerId };
     });
-    escena.addEventListener('pointerup', function (e) {
-      if (x0 === null) return;
-      var dx = e.clientX - x0, dy = e.clientY - y0;
-      x0 = null;
-      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) tocarVitrina(dx < 0 ? 1 : -1);
-      else if (Math.abs(dx) < 8 && Math.abs(dy) < 8) {
+    escena.addEventListener('pointermove', function (e) {
+      if (!arr || e.pointerId !== arr.id) return;
+      var dx = e.clientX - arr.x0, dy = e.clientY - arr.y0;
+      if (!arr.decidido && (Math.abs(dx) > 6 || Math.abs(dy) > 6)) {
+        arr.decidido = true;
+        arr.horizontal = Math.abs(dx) > Math.abs(dy);
+        if (arr.horizontal) { try { escena.setPointerCapture(e.pointerId); } catch (err) {} }
+      }
+      if (!arr.horizontal) return;
+      arr.vx = e.clientX - arr.x;
+      arr.x = e.clientX;
+      flota.style.transition = 'none';
+      flota.style.translate = (dx * 0.9) + 'px 0';
+      flota.style.setProperty('--gx', dx * 0.9);
+      vitrina.burbuja.empujar(-arr.vx / 22, 0);
+    });
+    function soltar(e) {
+      if (!arr || e.pointerId !== arr.id) return;
+      var dx = e.clientX - arr.x0, dy = e.clientY - arr.y0, vx = arr.vx, horizontal = arr.horizontal;
+      arr = null;
+      if (horizontal && (Math.abs(dx) > 70 || Math.abs(vx) > 9)) {
+        vitrina.pausa = Date.now() + 12000;
+        cambiarVitrina(dx < 0 ? 1 : -1);
+        programarVitrina();
+      } else if (horizontal) {
+        // no alcanzó: vuelve al centro rebotando
+        flota.style.transition = 'translate .7s cubic-bezier(.2, 1.5, .4, 1)';
+        flota.style.translate = '0px 0';
+        flota.style.setProperty('--gx', 0);
+        vitrina.burbuja.empujar(dx > 0 ? 0.45 : -0.45, 0);
+      } else if (e.type === 'pointerup' && Math.abs(dx) < 8 && Math.abs(dy) < 8) {
         fijarOrigen(escena);
         location.hash = '#/gorra/' + vitrina.lista[vitrina.i].id;
       }
-    });
-    escena.addEventListener('pointercancel', function () { x0 = null; });
+    }
+    escena.addEventListener('pointerup', soltar);
+    escena.addEventListener('pointercancel', soltar);
 
     var io = new IntersectionObserver(function (ents) {
       vitrina.visible = ents[0].isIntersecting;
@@ -146,7 +177,7 @@
   }
   function tocarVitrina(dir) {
     vitrina.pausa = Date.now() + 12000;
-    mostrarVitrina(vitrina.i + dir);
+    cambiarVitrina(dir);
     programarVitrina();
   }
   function programarVitrina() {
@@ -155,50 +186,62 @@
     var espera = Math.max(4800, vitrina.pausa - Date.now());
     vitrina.timer = setTimeout(function () {
       if (document.hidden || $('.detalle').classList.contains('abierto')) { programarVitrina(); return; }
-      mostrarVitrina(vitrina.i + 1);
+      cambiarVitrina(1);
       programarVitrina();
     }, espera);
   }
-  function mostrarVitrina(i, inicial) {
+  // dir 1 = siguiente (la burbuja sale por la izquierda y la nueva entra por la derecha)
+  function cambiarVitrina(dir) {
+    if (vitrina.ocupada) return;
+    if (reducido) { mostrarVitrina(vitrina.i + dir, dir); return; }
+    vitrina.ocupada = true;
+    var flota = vitrina.flota, b = vitrina.burbuja;
+    var lado = dir > 0 ? -1 : 1; // hacia dónde se mueve en pantalla
+    var siguiente = vitrina.lista[(vitrina.i + dir + vitrina.lista.length) % vitrina.lista.length];
+    var cargada = new Image();
+    cargada.src = foto(siguiente.fotos[0].archivo);
+
+    $('.vitrina__nombre').classList.add('cambia');
+    flota.style.transition = 'translate .45s cubic-bezier(.55, 0, .85, .35)';
+    flota.style.translate = (lado * 118) + '% 0';
+    flota.style.setProperty('--gx', lado * 40);
+    b.empujar(-lado * 0.65, 0);
+    b.pulso(0.6);
+
+    setTimeout(function () {
+      (cargada.decode ? cargada.decode() : Promise.resolve()).catch(function () {}).then(function () {
+        mostrarVitrina(vitrina.i + dir, dir);
+        flota.style.transition = 'none';
+        flota.style.translate = (-lado * 118) + '% 0';
+        void flota.offsetWidth;
+        flota.style.transition = 'translate .95s cubic-bezier(.16, 1.22, .3, 1)';
+        flota.style.translate = '0px 0';
+        flota.style.setProperty('--gx', 0);
+        b.empujar(-lado * 0.6, 0);
+        setTimeout(function () { vitrina.ocupada = false; }, 500);
+      });
+    }, 450);
+  }
+  function mostrarVitrina(i) {
     var n = vitrina.lista.length;
     vitrina.i = (i + n) % n;
     var g = vitrina.lista[vitrina.i];
     var img = $('[data-v-img]');
     var nombre = $('.vitrina__nombre');
-    var src = foto(g.fotos[0].archivo);
-
-    function aplicarTexto() {
-      $('[data-v-actual]').textContent = String(vitrina.i + 1).padStart(2, '0');
-      $('[data-v-marca]').textContent = g.marca;
-      $('[data-v-nombre]').textContent = g.nombre;
-      $('[data-v-estado]').innerHTML = etiquetas(g) + ' <span class="nota">&nbsp;' + esc(precio(g)) + '</span>';
-      var ver = $('[data-v-ver]');
-      ver.href = '#/gorra/' + g.id;
-      ver.onclick = function () { fijarOrigen($('[data-v-escena]')); };
-      img.alt = g.nombre;
-    }
-
-    if (inicial) { img.src = src; aplicarTexto(); return; }
-
-    img.classList.add('sale');
-    nombre.classList.add('cambia');
-    vitrina.burbuja.pulso(1);
-    var cargada = new Image();
-    cargada.src = src;
-    setTimeout(function () {
-      (cargada.decode ? cargada.decode() : Promise.resolve()).catch(function () {}).then(function () {
-        img.src = src;
-        aplicarTexto();
-        img.classList.remove('sale');
-        img.classList.add('entra');
-        void img.offsetWidth;
-        img.classList.remove('entra');
-        void nombre.offsetWidth;
-        nombre.classList.remove('cambia');
-      });
-    }, 420);
-    // precarga la siguiente
+    img.src = foto(g.fotos[0].archivo);
+    img.alt = g.nombre;
+    $('[data-v-actual]').textContent = String(vitrina.i + 1).padStart(2, '0');
+    $('[data-v-marca]').textContent = g.marca;
+    $('[data-v-nombre]').textContent = g.nombre;
+    $('[data-v-estado]').innerHTML = etiquetas(g) + ' <span class="nota">&nbsp;' + esc(precio(g)) + '</span>';
+    var ver = $('[data-v-ver]');
+    ver.href = '#/gorra/' + g.id;
+    ver.onclick = function () { fijarOrigen($('[data-v-escena]')); };
+    void nombre.offsetWidth;
+    nombre.classList.remove('cambia');
+    // precarga la siguiente y la anterior
     new Image().src = foto(vitrina.lista[(vitrina.i + 1) % n].fotos[0].archivo);
+    new Image().src = foto(vitrina.lista[(vitrina.i - 1 + n) % n].fotos[0].archivo);
   }
 
   /* ---------- filtros ---------- */
@@ -270,7 +313,8 @@
   /* ---------- cuadrícula ---------- */
   function pintarRejilla(animar) {
     var ul = $('[data-rejilla]');
-    $$('canvas', ul).forEach(function (c) { window.Burbujas.quitar(c); });
+    $$('canvas.burbuja:not(.burbuja--frente)', ul).forEach(function (c) { window.Burbujas.quitar(c); });
+    vivas = [];
     var l = filtradas();
     var ya = contar(function (g) { return g.estado === 'disponible' || g.estado === 'ultimas'; });
     var vienen = contar(function (g) { return g.estado === 'por-llegar'; });
@@ -283,9 +327,11 @@
         '<a href="#/gorra/' + esc(g.id) + '">' +
         '<div class="tarjeta__escena">' +
         '<span class="tarjeta__num">' + num(g) + '</span>' +
+        '<div class="flota">' +
         '<canvas class="burbuja" aria-hidden="true"></canvas>' +
-        '<img src="' + foto(g.fotos[0].archivo, true) + '" alt="" loading="lazy" decoding="async" width="400" height="400">' +
-        '</div>' +
+        '<img class="flota__gorra" src="' + foto(g.fotos[0].archivo, true) + '" alt="" loading="lazy" decoding="async" width="400" height="400">' +
+        '<canvas class="burbuja burbuja--frente" aria-hidden="true"></canvas>' +
+        '</div></div>' +
         '<p class="tarjeta__marca">' + esc(g.marca) + '</p>' +
         '<h3 class="tarjeta__nombre">' + esc(g.nombre) + '</h3>' +
         '<p class="tarjeta__precio' + (typeof g.precio === 'number' ? '' : ' tarjeta__precio--pendiente') + '">' + esc(precio(g)) + '</p>' +
@@ -295,11 +341,36 @@
     $('[data-vacia]').hidden = l.length > 0;
 
     $$('.tarjeta', ul).forEach(function (li, i) {
-      var b = window.Burbujas.registrar($('canvas', li), { semilla: 1 + i * 1.37 });
+      var b = window.Burbujas.registrar($('canvas.burbuja', li), {
+        frente: $('canvas.burbuja--frente', li), semilla: 1 + i * 1.37
+      });
       var a = $('a', li);
       a.addEventListener('pointerdown', function () { b.pulso(0.8); });
       a.addEventListener('click', function () { fijarOrigen($('.tarjeta__escena', li)); });
+      vivas.push({ escena: $('.tarjeta__escena', li), flota: $('.flota', li), burbuja: b, fase: (i % 2) * Math.PI + (i >> 1) * 0.6, x: 0 });
       if (!animar) observarRevelar(li);
+    });
+    balancear();
+  }
+
+  /* ---------- balanceo: al deslizar, las burbujas cambian de lado a lado ----------
+     Cada burbuja oscila según su altura en pantalla (las dos columnas en contrafase).
+     Mientras se mueve, el líquido se estira hacia el lado contrario, como con inercia. */
+  var vivas = [];
+  function balancear() {
+    if (reducido || !vivas.length) return;
+    var alto = window.innerHeight;
+    vivas.forEach(function (v) {
+      var r = v.escena.getBoundingClientRect();
+      if (r.bottom < -100 || r.top > alto + 100) return;
+      var amp = Math.min(26, r.width * 0.11);
+      var centro = (r.top + r.height / 2) / alto; // 0 arriba, 1 abajo
+      var x = Math.sin(centro * Math.PI * 1.7 + v.fase) * amp;
+      var dx = x - v.x;
+      v.x = x;
+      v.flota.style.translate = x.toFixed(1) + 'px 0';
+      v.flota.style.setProperty('--gx', x.toFixed(1));
+      if (Math.abs(dx) > 0.3) v.burbuja.empujar(-dx / 9, 0);
     });
   }
 
@@ -307,14 +378,21 @@
   var det = {};
   function montarDetalle() {
     det.el = $('.detalle');
-    det.burbuja = window.Burbujas.registrar($('[data-burbuja="detalle"]'), { semilla: 5.2, prioridad: true });
+    det.burbuja = window.Burbujas.registrar($('[data-burbuja="detalle"]'), {
+      frente: $('[data-burbuja-frente="detalle"]'), semilla: 5.2, prioridad: true, sensible: 0
+    });
     $('[data-cerrar]', det.el).addEventListener('click', cerrarConHistoria);
     $('[data-compartir]', det.el).addEventListener('click', compartir);
     $$('[data-tab]', det.el).forEach(function (t) {
       t.addEventListener('click', function () { pestana(t.dataset.tab); });
     });
     var carril = $('[data-d-carril]');
+    var izqAnterior = 0;
     carril.addEventListener('scroll', function () {
+      // la gorra pasa por encima de la burbuja y el líquido se estira con el deslizamiento
+      var d = carril.scrollLeft - izqAnterior;
+      izqAnterior = carril.scrollLeft;
+      if (Math.abs(d) > 0.5) det.burbuja.empujar(-d / 28, 0);
       var i = Math.round(carril.scrollLeft / carril.clientWidth);
       if (i !== det.lamina) { det.lamina = i; det.burbuja.pulso(0.7); indiceProducto(); }
     }, { passive: true });
@@ -587,12 +665,14 @@
     var alto = portada.offsetHeight;
     if (y < alto * 1.2 && !reducido) portada.style.setProperty('--py', y.toFixed(1));
     document.body.classList.toggle('paso-portada', y > alto * 0.55);
-    var v = Math.abs(y - yAnterior);
-    if (v > 6 && window.Burbujas) window.Burbujas.agitar(Math.min(0.55, v / 90));
+    var v = y - yAnterior;
+    if (Math.abs(v) > 1 && window.Burbujas) window.Burbujas.scroll(v);
+    if (!document.body.classList.contains('detalle-abierto')) balancear();
     yAnterior = y;
   }
   window.addEventListener('scroll', function () {
     if (!pendiente) { pendiente = true; requestAnimationFrame(alHacerScroll); }
   }, { passive: true });
+  window.addEventListener('resize', balancear);
   alHacerScroll();
 })();

@@ -204,13 +204,12 @@ body.paso-portada .marca, body.menu-abierto .marca { opacity: 1; }
   pointer-events: none;
   translate: 0 calc(var(--py, 0) * -.1px);
 }
-.portada__titulo .linea { position: absolute; display: block; overflow: hidden; }
-.portada__titulo .linea > span { display: block; transform: translateY(105%); }
-.portada.lista .portada__titulo .linea > span { animation: subir 1.1s var(--curva) both; }
-.portada__titulo .l1 { top: 9.5cqw; left: 4cqw; font-size: 41cqw; }
-.portada__titulo .l1 > span { animation-delay: .35s; }
-.portada__titulo .l2 { top: 46.2cqw; right: 3.5cqw; font-size: 41cqw; }
-.portada__titulo .l2 > span { animation-delay: .5s; }
+/* "MONO CAPS" en una línea, en el cielo negro de la foto: no tapa ninguna gorra.
+   La Fox blanca (recorte, z-index 3) roza el borde inferior de la palabra CAPS. */
+.portada__titulo .linea { position: absolute; left: 4cqw; top: 28.6cqw; font-size: 21.2cqw; display: block; overflow: hidden; white-space: nowrap; }
+.portada__titulo .linea > span { display: inline-block; transform: translateY(105%); }
+.portada.lista .portada__titulo .linea > span { animation: subir 1.1s var(--curva) both; animation-delay: .35s; }
+.portada.lista .portada__titulo .linea > span + span { animation-delay: .5s; }
 
 .portada__velo {
   position: absolute; inset: 0; z-index: 1; pointer-events: none;
@@ -259,8 +258,9 @@ body.paso-portada .marca, body.menu-abierto .marca { opacity: 1; }
 
 /* ---------- Burbuja ---------- */
 .burbuja { display: block; }
+.burbuja--css-frente { border-radius: 50%; scale: .77; box-shadow: inset 0 0 0 1px rgba(255,255,255,.14); }
 .burbuja--css {
-  border-radius: 50%;
+  border-radius: 50%; scale: .77;
   background:
     radial-gradient(circle at 34% 26%, rgba(255,255,255,.2), transparent 18%),
     radial-gradient(circle at 50% 58%, #17181f 0, #07070a 58%, #030304 72%),
@@ -282,15 +282,20 @@ body.paso-portada .marca, body.menu-abierto .marca { opacity: 1; }
   user-select: none;
   -webkit-user-select: none;
 }
-.vitrina__burbuja { position: absolute; left: 9%; top: 9%; width: 82%; height: 82%; }
-.vitrina__gorra {
-  position: absolute; left: 10%; top: 12%; width: 80%;
+/* Burbuja + gorra: fondo detrás, gorra en el centro, vidrio delante */
+.flota { position: absolute; inset: 0; }
+.flota .burbuja { position: absolute; inset: 0; width: 100%; height: 100%; }
+.burbuja--frente { pointer-events: none; z-index: 2; }
+.flota__gorra {
+  position: absolute; z-index: 1; left: 17%; top: 17%; width: 66%;
   pointer-events: none;
   animation: flotar 6s ease-in-out infinite;
-  transition: opacity .45s var(--curva), scale .55s var(--curva), filter .45s;
+  animation-delay: var(--d, 0s);
+  /* la gorra se queda un poco atrás dentro de la burbuja cuando esta se mueve */
+  translate: calc(var(--gx, 0) * -.28px) 0;
+  transition: translate .5s var(--curva);
 }
-.vitrina__gorra.sale { opacity: 0; scale: .72; filter: blur(8px); }
-.vitrina__gorra.entra { opacity: 0; scale: 1.12; filter: blur(4px); transition: none; }
+.vitrina__escena { overflow: hidden; }
 @keyframes flotar {
   0%, 100% { transform: translateY(0) rotate(-1deg); }
   50% { transform: translateY(-3.2%) rotate(1.2deg); }
@@ -373,12 +378,6 @@ body.paso-portada .marca, body.menu-abierto .marca { opacity: 1; }
 .tarjeta > a { display: block; text-decoration: none; color: inherit; transition: transform .3s var(--curva); }
 .tarjeta > a:active { transform: scale(.965); }
 .tarjeta__escena { position: relative; aspect-ratio: 1; }
-.tarjeta__escena .burbuja { position: absolute; left: 4%; top: 4%; width: 92%; height: 92%; }
-.tarjeta__escena img {
-  position: absolute; left: 1%; top: 3%; width: 98%;
-  animation: flotar 6s ease-in-out infinite;
-  animation-delay: var(--d, 0s);
-}
 .tarjeta__num {
   position: absolute; z-index: 2; left: 0; top: 0;
   font: 400 15px/1 var(--display); color: var(--humo); letter-spacing: .02em;
@@ -388,7 +387,7 @@ body.paso-portada .marca, body.menu-abierto .marca { opacity: 1; }
 .tarjeta__precio { margin-top: 6px; font: 500 15px/1.2 var(--texto); color: var(--ceniza); }
 .tarjeta__precio--pendiente { font-size: 14px; color: var(--humo); }
 .tarjeta__estado { margin-top: 10px; }
-.tarjeta--agotada .tarjeta__escena img { opacity: .38; }
+.tarjeta--agotada .flota__gorra { opacity: .38; }
 .tarjeta--agotada .tarjeta__nombre { text-decoration: line-through; text-decoration-thickness: 1px; color: var(--humo); }
 .tarjeta.entra { animation: aparecer .6s var(--curva) both; animation-delay: var(--e, 0s); }
 
@@ -468,7 +467,7 @@ body.paso-portada .marca, body.menu-abierto .marca { opacity: 1; }
 }
 .detalle__pestanas button[aria-selected="true"] { color: var(--blanco); border-bottom-color: var(--blanco); }
 .detalle__galeria { position: relative; aspect-ratio: 1; container-type: inline-size; }
-.detalle__burbuja { position: absolute; left: 8%; top: 8%; width: 84%; height: 84%; }
+.detalle__burbuja { position: absolute; inset: 0; width: 100%; height: 100%; }
 .carril {
   position: absolute; inset: 0;
   display: flex; overflow-x: auto; overflow-y: hidden;
@@ -478,8 +477,8 @@ body.paso-portada .marca, body.menu-abierto .marca { opacity: 1; }
 .carril::-webkit-scrollbar { display: none; }
 .carril__lamina { flex: 0 0 100%; scroll-snap-align: center; display: grid; place-items: center; position: relative; }
 .carril__lamina button { width: 100%; height: 100%; display: grid; place-items: center; }
-.carril__lamina img { width: 86%; animation: flotar 6s ease-in-out infinite; }
-.carril__lamina--foto img { width: 62%; animation: none; }
+.carril__lamina img { width: 66%; animation: flotar 6s ease-in-out infinite; }
+.carril__lamina--foto img { width: 48%; animation: none; }
 .carril__indice {
   position: absolute; left: 0; right: 0; bottom: 4px; text-align: center;
   font: 600 13px/1 var(--cond); letter-spacing: .14em; color: var(--humo); text-transform: uppercase;

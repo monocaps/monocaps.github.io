@@ -2,15 +2,20 @@
   Burbujas de obsidiana líquida.
 
   Un solo contexto WebGL (fuera de pantalla) dibuja todas las burbujas de la página
-  y copia cada cuadro a su <canvas> 2D. Así hay burbujas "vivas" en todas las tarjetas
-  sin abrir un contexto por tarjeta, que el celular no aguantaría.
+  y copia cada cuadro a sus <canvas> 2D. Cada burbuja tiene dos capas:
+    - fondo: el cuerpo oscuro, detrás de la gorra
+    - frente: el brillo del vidrio (borde y reflejo), delante de la gorra
+  así la gorra queda "dentro" de la burbuja.
 
-  La luz que refleja el borde imita las luces de la ciudad vistas desde el mirador:
-  ámbar y azul, como en las fotos de Mono Caps.
+  La burbuja se comporta como líquido: se estira en la dirección en que se mueve
+  (scroll, arrastre con el dedo) y rebota con un resorte al detenerse.
+  La luz del borde imita las luces de la ciudad vistas desde el mirador (ámbar y azul).
 
   Uso:
-    Burbujas.registrar(canvas, { semilla: 3 })  -> { pulso() }
-    Burbujas.agitar(0.6)                         // p. ej. al hacer scroll rápido
+    var b = Burbujas.registrar(canvasFondo, { frente: canvasFrente, semilla: 3 });
+    b.empujar(x, y)    // hacia dónde se abomba el líquido (unidades ~ -0.7..0.7)
+    b.pulso()          // ondulación
+    Burbujas.scroll(vy) // velocidad del scroll en px por cuadro
 */
 (function () {
   'use strict';
@@ -18,11 +23,7 @@
   var LADO = 640; // tamaño máximo de una burbuja en píxeles
   var reducido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  var VERT = [
-    'attribute vec2 aPos;',
-    'varying vec2 vUv;',
-    'void main(){ vUv = aPos * 0.5 + 0.5; gl_Position = vec4(aPos, 0.0, 1.0); }'
-  ].join('\n');
+  var VERT = 'attribute vec2 aPos; varying vec2 vUv; void main(){ vUv = aPos * 0.5 + 0.5; gl_Position = vec4(aPos, 0.0, 1.0); }';
 
   var FRAG = [
     '#ifdef GL_FRAGMENT_PRECISION_HIGH',
@@ -31,7 +32,8 @@
     'precision mediump float;',
     '#endif',
     'varying vec2 vUv;',
-    'uniform float uTime, uSeed, uPulse, uPx;',
+    'uniform float uTime, uSeed, uPulse, uPx, uCapa;',
+    'uniform vec2 uDef;',
 
     // Ruido simplex 3D (Ashima Arts / Stefan Gustavson, licencia MIT)
     'vec3 mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;}',
@@ -58,7 +60,7 @@
     ' return 42.0*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));',
     '}',
 
-    // Entorno que se refleja: cielo nocturno + franja de luces de ciudad (ámbar y azul)
+    // Entorno que se refleja: cielo nocturno + franja de luces de ciudad
     'vec3 entorno(vec3 rd, float t){',
     ' float y = rd.y;',
     ' vec3 cielo = mix(vec3(0.006,0.007,0.014), vec3(0.05,0.055,0.085), smoothstep(-0.1,1.0,y));',
@@ -66,52 +68,64 @@
     ' vec2 e = vec2(atan(rd.x, rd.z) * 1.4, y * 3.2);',
     ' float l1 = smoothstep(0.30, 0.85, snoise(vec3(e * 1.7, t * 0.12)));',
     ' float l2 = smoothstep(0.38, 0.90, snoise(vec3(e * 1.7 + 11.0, t * 0.14)));',
-    ' vec3 ambar = vec3(1.0, 0.58, 0.22); vec3 azul = vec3(0.34, 0.56, 1.0);',
-    ' vec3 ciudad = (ambar * l1 + azul * l2 * 0.9) * franja * 1.5;',
+    ' vec3 ciudad = (vec3(1.0, 0.58, 0.22) * l1 + vec3(0.34, 0.56, 1.0) * l2 * 0.9) * franja * 1.5;',
     ' ciudad += vec3(0.22, 0.14, 0.08) * franja * 0.45;',
-    ' float arriba = smoothstep(0.35, 0.95, y) * 0.55;',
-    ' return cielo + ciudad + vec3(arriba);',
+    ' return cielo + ciudad + vec3(smoothstep(0.35, 0.95, y) * 0.55);',
     '}',
 
     'void main(){',
-    ' vec2 p = (vUv * 2.0 - 1.0) * 1.2;',
+    ' vec2 p = (vUv * 2.0 - 1.0) * 1.3;',
+    // deformación líquida: se estira en la dirección del movimiento y se queda un poco atrás
+    ' float s = min(length(uDef), 0.7);',
+    ' if (s > 0.001) {',
+    '   vec2 dir = uDef / length(uDef);',
+    '   float a = dot(p, dir); vec2 perp = p - a * dir;',
+    '   a = a / (1.0 + s * 0.5) - s * 0.10;',
+    '   perp *= 1.0 + s * 0.22 + 0.10 * s * a;',
+    '   p = a * dir + perp;',
+    ' }',
     ' float t = uTime * 0.32 + uSeed * 7.31;',
     ' float ang = atan(p.y, p.x);',
     ' vec2 c = vec2(cos(ang), sin(ang));',
-    ' float amp = 1.0 + uPulse * 1.3;',
-    ' float ond = snoise(vec3(c * 0.85, t * 0.55)) * 0.034 * amp',
-    '           + snoise(vec3(c * 2.0, t * 0.85 + 3.0)) * 0.013 * amp;',
+    ' float amp = 1.0 + uPulse * 1.4 + s * 0.8;',
+    ' float ond = snoise(vec3(c * 0.85, t * 0.55)) * 0.032 * amp',
+    '           + snoise(vec3(c * 2.0, t * 0.85 + 3.0)) * 0.012 * amp;',
     ' float r = length(p) / (1.0 + ond);',
-    ' float aa = uPx * 2.4;',
-    ' float alfa = 1.0 - smoothstep(1.0 - aa, 1.0, r);',
+    ' float alfa = 1.0 - smoothstep(1.0 - uPx * 2.4, 1.0, r);',
     ' if (alfa <= 0.0) { gl_FragColor = vec4(0.0); return; }',
     ' vec2 q = p / (1.0 + ond);',
     ' float z = sqrt(max(0.0, 1.0 - dot(q, q)));',
     ' vec3 n = normalize(vec3(q, z));',
-    // superficie líquida: el ruido mueve las normales
     ' vec3 np = n * 1.5 + vec3(0.0, 0.0, t * 0.45);',
-    ' n = normalize(n + (0.20 + 0.12 * uPulse) * vec3(snoise(np), snoise(np + 17.1), 0.0));',
+    ' n = normalize(n + (0.18 + 0.12 * uPulse + 0.1 * s) * vec3(snoise(np), snoise(np + 17.1), 0.0));',
     ' vec3 v = vec3(0.0, 0.0, 1.0);',
     ' vec3 rd = reflect(-v, n);',
     ' float fres = pow(1.0 - max(dot(n, v), 0.0), 2.0);',
-    // cuerpo casi negro con un resplandor interno detrás de la gorra
-    ' vec3 col = vec3(0.010, 0.010, 0.016);',
-    ' vec2 g = q - vec2(0.0, -0.08);',
-    ' col += vec3(0.095, 0.098, 0.122) * exp(-dot(g, g) * 1.8);',
-    ' col += entorno(rd, t) * (0.06 + 1.25 * fres);',
-    // filo de luz en el borde, como el canto de una piedra pulida
+    ' vec3 env = entorno(rd, t);',
     ' float filo = smoothstep(0.80, 0.985, r) * (1.0 - smoothstep(0.985, 1.0, r));',
-    ' col += mix(vec3(0.55, 0.62, 0.85), vec3(1.0, 0.7, 0.4), smoothstep(0.2, -0.6, q.y)) * filo * 0.22;',
+    ' vec3 colFilo = mix(vec3(0.55, 0.62, 0.85), vec3(1.0, 0.7, 0.4), smoothstep(0.2, -0.6, q.y)) * filo;',
     ' vec3 L = normalize(vec3(-0.45, 0.62, 0.65));',
     ' float rl = max(dot(reflect(-L, n), v), 0.0);',
-    ' col += vec3(0.92, 0.94, 1.0) * (pow(rl, 70.0) * 0.7 + pow(rl, 7.0) * 0.07);',
-    ' gl_FragColor = vec4(col * alfa, alfa);',
+    ' vec3 brillo = vec3(0.92, 0.94, 1.0) * (pow(rl, 70.0) * 0.75 + pow(rl, 7.0) * 0.05);',
+    ' if (uCapa < 0.5) {',
+    // fondo: cuerpo casi negro con un resplandor interno que separa las gorras negras
+    '   vec3 col = vec3(0.010, 0.010, 0.016);',
+    '   vec2 g = q - vec2(0.0, -0.04);',
+    '   col += vec3(0.10, 0.103, 0.128) * exp(-dot(g, g) * 1.7);',
+    '   col += env * (0.05 + 0.9 * fres) + colFilo * 0.12;',
+    '   gl_FragColor = vec4(col * alfa, alfa);',
+    ' } else {',
+    // frente: solo el vidrio (borde iluminado y reflejo), transparente en el centro
+    '   vec3 col = env * pow(fres, 1.6) * 0.95 + colFilo * 0.22 + brillo;',
+    '   float a = clamp(max(col.r, max(col.g, col.b)), 0.0, 1.0);',
+    '   gl_FragColor = vec4(col * alfa, a * alfa);',
+    ' }',
     '}'
   ].join('\n');
 
-  var gl, glCanvas, prog, u = {};
+  var gl, glCanvas, u = {};
   var items = [];
-  var agitacion = 0;
+  var global = { y: 0 };
   var t0 = performance.now();
   var corriendo = false;
   var cuadro = 0;
@@ -123,25 +137,24 @@
       var opts = { premultipliedAlpha: true, alpha: true, antialias: false, preserveDrawingBuffer: true };
       gl = glCanvas.getContext('webgl', opts) || glCanvas.getContext('experimental-webgl', opts);
       if (!gl) return false;
-      function sh(tipo, src) {
+      var sh = function (tipo, src) {
         var s = gl.createShader(tipo);
         gl.shaderSource(s, src); gl.compileShader(s);
         if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
         return s;
-      }
-      prog = gl.createProgram();
+      };
+      var prog = gl.createProgram();
       gl.attachShader(prog, sh(gl.VERTEX_SHADER, VERT));
       gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FRAG));
       gl.linkProgram(prog);
       if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(prog));
       gl.useProgram(prog);
-      var buf = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
       var loc = gl.getAttribLocation(prog, 'aPos');
       gl.enableVertexAttribArray(loc);
       gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-      ['uTime', 'uSeed', 'uPulse', 'uPx'].forEach(function (k) { u[k] = gl.getUniformLocation(prog, k); });
+      ['uTime', 'uSeed', 'uPulse', 'uPx', 'uCapa', 'uDef'].forEach(function (k) { u[k] = gl.getUniformLocation(prog, k); });
       gl.clearColor(0, 0, 0, 0);
       glCanvas.addEventListener('webglcontextlost', function (e) { e.preventDefault(); gl = null; marcarCSS(); }, false);
       return true;
@@ -153,7 +166,10 @@
   }
 
   function marcarCSS() {
-    items.forEach(function (it) { it.canvas.classList.add('burbuja--css'); });
+    items.forEach(function (it) {
+      it.canvas.classList.add('burbuja--css');
+      if (it.frente) it.frente.classList.add('burbuja--css-frente');
+    });
   }
 
   function medir(it) {
@@ -161,23 +177,40 @@
     var w = Math.min(LADO, Math.round(it.canvas.clientWidth * dpr));
     if (w > 0 && it.canvas.width !== w) {
       it.canvas.width = it.canvas.height = w;
-      it.sucio = true;
+      if (it.frente) it.frente.width = it.frente.height = w;
     }
+  }
+
+  function pintarCapa(ctx, w, capa) {
+    gl.uniform1f(u.uCapa, capa);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    ctx.clearRect(0, 0, w, w);
+    ctx.drawImage(glCanvas, 0, LADO - w, w, w, 0, 0, w, w);
   }
 
   function dibujar(it, tiempo) {
     var w = it.canvas.width;
     if (!w || !gl) return;
     gl.viewport(0, 0, w, w);
-    gl.clear(gl.COLOR_BUFFER_BIT);
     gl.uniform1f(u.uTime, tiempo);
     gl.uniform1f(u.uSeed, it.semilla);
-    gl.uniform1f(u.uPulse, Math.min(1, it.pulso + agitacion));
-    gl.uniform1f(u.uPx, 1.2 * 2 / w);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-    it.ctx.clearRect(0, 0, w, w);
-    it.ctx.drawImage(glCanvas, 0, LADO - w, w, w, 0, 0, w, w);
-    it.sucio = false;
+    gl.uniform1f(u.uPulse, Math.min(1, it.pulso));
+    gl.uniform1f(u.uPx, 1.3 * 2 / w);
+    // en pantalla "abajo" es +y; en el shader es -y
+    gl.uniform2f(u.uDef, it.dx, -it.dy);
+    pintarCapa(it.ctx, w, 0);
+    if (it.ctxFrente) pintarCapa(it.ctxFrente, w, 1);
+  }
+
+  // resorte: la deformación persigue al objetivo y rebota un poco al llegar
+  function fisica(it) {
+    var tx = it.ex, ty = it.ey + global.y * it.sensible;
+    it.vx = (it.vx + (tx - it.dx) * 0.16) * 0.80;
+    it.vy = (it.vy + (ty - it.dy) * 0.16) * 0.80;
+    it.dx += it.vx; it.dy += it.vy;
+    it.ex *= 0.86; it.ey *= 0.86;
+    it.pulso *= 0.95;
   }
 
   function bucle(ahora) {
@@ -185,14 +218,14 @@
     if (!visibles.length || document.hidden || !gl) { corriendo = false; return; }
     cuadro++;
     var tiempo = reducido ? 4 : (ahora - t0) / 1000;
-    // con muchas burbujas en pantalla, cada una se actualiza a 30 cuadros por segundo
+    global.y *= 0.88;
+    // con muchas burbujas en pantalla, cada una se redibuja a 30 cuadros por segundo
     var mitad = visibles.length > 3;
     visibles.forEach(function (it, i) {
-      it.pulso *= 0.94;
-      if (reducido) { if (it.sucio) dibujar(it, tiempo); return; }
+      fisica(it);
+      if (reducido) { if (it.sucio) { dibujar(it, tiempo); it.sucio = false; } return; }
       if (!mitad || (cuadro + i) % 2 === 0 || it.prioridad) dibujar(it, tiempo);
     });
-    agitacion *= 0.92;
     requestAnimationFrame(bucle);
   }
 
@@ -200,20 +233,25 @@
     if (!corriendo && gl) { corriendo = true; requestAnimationFrame(bucle); }
   }
 
+  function buscar(canvas) {
+    for (var i = 0; i < items.length; i++) if (items[i].canvas === canvas) return items[i];
+    return null;
+  }
+
   var io = 'IntersectionObserver' in window ? new IntersectionObserver(function (ents) {
     ents.forEach(function (e) {
-      var it = items.find(function (x) { return x.canvas === e.target; });
+      var it = buscar(e.target);
       if (!it) return;
       it.visible = e.isIntersecting;
       if (it.visible) { medir(it); it.sucio = true; }
     });
     arrancar();
-  }, { rootMargin: '80px' }) : null;
+  }, { rootMargin: '120px' }) : null;
 
   var ro = 'ResizeObserver' in window ? new ResizeObserver(function (ents) {
     ents.forEach(function (e) {
-      var it = items.find(function (x) { return x.canvas === e.target; });
-      if (it) medir(it);
+      var it = buscar(e.target);
+      if (it) { medir(it); it.sucio = true; }
     });
     arrancar();
   }) : null;
@@ -222,25 +260,31 @@
 
   window.Burbujas = {
     soportado: soportado,
-    registrar: function (canvas, opciones) {
-      opciones = opciones || {};
+    registrar: function (canvas, op) {
+      op = op || {};
       var it = {
-        canvas: canvas,
-        ctx: canvas.getContext('2d'),
-        semilla: opciones.semilla || Math.random() * 10,
-        prioridad: !!opciones.prioridad,
-        pulso: 0,
-        visible: !io,
-        sucio: true
+        canvas: canvas, ctx: canvas.getContext('2d'),
+        frente: op.frente || null, ctxFrente: op.frente ? op.frente.getContext('2d') : null,
+        semilla: op.semilla || Math.random() * 10,
+        prioridad: !!op.prioridad,
+        sensible: op.sensible == null ? 1 : op.sensible,
+        pulso: 0, dx: 0, dy: 0, vx: 0, vy: 0, ex: 0, ey: 0,
+        visible: !io, sucio: true
       };
-      if (!soportado) { canvas.classList.add('burbuja--css'); }
       items.push(it);
+      if (!soportado) marcarCSS();
       if (io) io.observe(canvas);
       if (ro) ro.observe(canvas);
       medir(it);
       arrancar();
       return {
         pulso: function (f) { it.pulso = Math.max(it.pulso, f || 1); it.sucio = true; arrancar(); },
+        empujar: function (x, y) {
+          if (reducido) return;
+          it.ex = Math.max(-0.7, Math.min(0.7, x || 0));
+          it.ey = Math.max(-0.7, Math.min(0.7, y || 0));
+          arrancar();
+        },
         semilla: function (s) { it.semilla = s; it.sucio = true; }
       };
     },
@@ -252,7 +296,13 @@
         return false;
       });
     },
-    agitar: function (f) { agitacion = Math.min(0.8, Math.max(agitacion, f)); arrancar(); },
+    // velocidad del scroll (px por cuadro): estira las burbujas en vertical
+    scroll: function (vy) {
+      if (reducido) return;
+      var objetivo = Math.max(-0.4, Math.min(0.4, vy / 95));
+      if (Math.abs(objetivo) > Math.abs(global.y)) global.y = objetivo;
+      arrancar();
+    },
     reanudar: arrancar
   };
 
