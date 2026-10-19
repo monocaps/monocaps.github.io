@@ -4,142 +4,146 @@
     "whatsappVisible": "322 641 3607",
     "mensajePedir": "Hola Mono 👋 Quiero la {nombre}, talla {talla}.",
     "mensajeApartar": "Hola Mono 👋 Quiero apartar la {nombre}, talla {talla}, para cuando llegue.",
+    "mensajeEncargo": "Hola Mono 👋 Vi que la {nombre} ya se vendió. ¿Me la puedes encargar en talla {talla}?",
     "mensajeGeneral": "Hola Mono 👋 Quiero información sobre las gorras.",
     "instagram": "",
     "tiktok": "",
-    "pagos": ["Nequi", "Daviplata", "Bancolombia", "Contraentrega", "Efectivo"],
-    "entregaGratis": ["Pereira", "Supía (Caldas)"],
+    "pagos": [
+      "Nequi",
+      "Daviplata",
+      "Bancolombia",
+      "Contraentrega",
+      "Efectivo"
+    ],
+    "entregaGratis": [
+      "Pereira",
+      "Supía (Caldas)"
+    ],
     "envios": "Envíos a toda Colombia",
     "promo": "Precio especial llevando 2 gorras o más"
   },
-
   "gorras": [
     {
       "id": "fox-racing-azul-oscuro",
       "nombre": "Fox Racing azul oscuro",
       "marca": "Fox Racing",
-      "precio": null,
-      "tallas": ["S/M"],
+      "precio": 185000,
+      "tallas": [
+        "S/M"
+      ],
       "ajuste": "Flexfit",
       "estado": "disponible",
       "nueva": false,
       "nota": "Bordado FOXRACING al frente con «19 74 Trade Mark»; zorro rojo atrás.",
       "fotos": [
-        { "archivo": "fox-racing-azul-oscuro_frente", "vista": "Frente" },
-        { "archivo": "fox-racing-azul-oscuro_atras", "vista": "Atrás" }
+        {
+          "archivo": "fox-racing-azul-oscuro_frente",
+          "vista": "Frente"
+        },
+        {
+          "archivo": "fox-racing-azul-oscuro_atras",
+          "vista": "Atrás"
+        }
       ],
       "fotosReales": [
-        { "archivo": "IMG_0253", "vista": "Frente" },
-        { "archivo": "IMG_0258", "vista": "Atrás" }
-      ]
-    },
-    {
-      "id": "fox-roja",
-      "nombre": "Fox roja",
-      "marca": "Fox Racing",
-      "precio": null,
-      "tallas": ["S/M"],
-      "ajuste": "Flexfit",
-      "estado": "disponible",
-      "nueva": false,
-      "nota": "Cabeza de zorro negra al frente. Su etiqueta dice «Fox TruDri – Performance fabric».",
-      "fotos": [
-        { "archivo": "fox-roja_frente", "vista": "Frente" }
-      ],
-      "fotosReales": [
-        { "archivo": "IMG_0249", "vista": "Frente" },
-        { "archivo": "IMG_0251", "vista": "Frente, otro ángulo" }
-      ]
-    },
-    {
-      "id": "fox-blanca",
-      "nombre": "Fox blanca",
-      "marca": "Fox Racing",
-      "precio": null,
-      "tallas": ["S/M"],
-      "ajuste": "Flexfit",
-      "estado": "disponible",
-      "nueva": false,
-      "nota": "Logo FOX grande en azul de lado a lado; zorro azul atrás.",
-      "fotos": [
-        { "archivo": "fox-blanca_frente", "vista": "Frente" },
-        { "archivo": "fox-blanca_atras", "vista": "Atrás" }
-      ],
-      "fotosReales": [
-        { "archivo": "IMG_0246", "vista": "Frente" },
-        { "archivo": "IMG_0240", "vista": "Atrás" }
+        {
+          "archivo": "IMG_0253",
+          "vista": "Frente"
+        },
+        {
+          "archivo": "IMG_0258",
+          "vista": "Atrás"
+        }
       ]
     },
     {
       "id": "hurley-azul-rey",
       "nombre": "Hurley azul rey",
       "marca": "Hurley",
-      "precio": null,
-      "tallas": ["S/M"],
+      "precio": 160000,
+      "tallas": [
+        "S/M"
+      ],
       "ajuste": "Flexfit",
       "estado": "disponible",
       "nueva": false,
       "nota": "Logo Hurley blanco al frente; «Hurley» atrás.",
       "fotos": [
-        { "archivo": "hurley-azul_frente", "vista": "Frente" },
-        { "archivo": "hurley-azul_atras-detalle", "vista": "Atrás (detalle)", "recorte": false }
+        {
+          "archivo": "hurley-azul_frente",
+          "vista": "Frente"
+        },
+        {
+          "archivo": "hurley-azul_atras-detalle",
+          "vista": "Atrás (detalle)",
+          "recorte": false
+        }
       ],
       "fotosReales": [
-        { "archivo": "IMG_0267", "vista": "Frente" },
-        { "archivo": "IMG_0263", "vista": "Atrás" }
-      ]
-    },
-    {
-      "id": "fox-negra-logo-gris",
-      "nombre": "Fox negra",
-      "marca": "Fox Racing",
-      "precio": null,
-      "tallas": ["S/M"],
-      "ajuste": "Flexfit",
-      "estado": "disponible",
-      "nueva": false,
-      "nota": "Logo FOX grande en gris; zorro gris atrás.",
-      "fotos": [
-        { "archivo": "fox-negra-logo-gris_frente", "vista": "Frente" },
-        { "archivo": "fox-negra-logo-gris_atras", "vista": "Atrás" }
-      ],
-      "fotosReales": [
-        { "archivo": "IMG_0261", "vista": "Frente" },
-        { "archivo": "IMG_0262", "vista": "Atrás" }
+        {
+          "archivo": "IMG_0267",
+          "vista": "Frente"
+        },
+        {
+          "archivo": "IMG_0263",
+          "vista": "Atrás"
+        }
       ]
     },
     {
       "id": "fox-gris-oscuro",
       "nombre": "Fox gris oscuro",
       "marca": "Fox Racing",
-      "precio": null,
-      "tallas": ["S/M"],
+      "precio": 185000,
+      "tallas": [
+        "S/M"
+      ],
       "ajuste": "Flexfit",
       "estado": "disponible",
       "nueva": false,
       "nota": "Logo FOX grande en gris claro; zorro gris claro atrás.",
       "fotos": [
-        { "archivo": "fox-gris-oscuro_frente", "vista": "Frente" },
-        { "archivo": "fox-gris-oscuro_atras", "vista": "Atrás" }
+        {
+          "archivo": "fox-gris-oscuro_frente",
+          "vista": "Frente"
+        },
+        {
+          "archivo": "fox-gris-oscuro_atras",
+          "vista": "Atrás"
+        }
       ],
       "fotosReales": [
-        { "archivo": "IMG_0268", "vista": "Frente" },
-        { "archivo": "IMG_0270", "vista": "Atrás" }
+        {
+          "archivo": "IMG_0268",
+          "vista": "Frente"
+        },
+        {
+          "archivo": "IMG_0270",
+          "vista": "Atrás"
+        }
       ]
     },
     {
       "id": "alpinestars-negra",
       "nombre": "Alpinestars negra",
       "marca": "Alpinestars",
-      "precio": null,
-      "tallas": ["S/M"],
+      "precio": 155000,
+      "tallas": [
+        "S/M"
+      ],
       "ajuste": "Flexfit",
       "estado": "por-llegar",
       "nueva": true,
       "nota": "Logo Alpinestars blanco al frente.",
       "fotos": [
-        { "archivo": "alpinestars-negra_frente", "vista": "Frente" },
-        { "archivo": "alpinestars-negra_atras", "vista": "Atrás" }
+        {
+          "archivo": "alpinestars-negra_frente",
+          "vista": "Frente"
+        },
+        {
+          "archivo": "alpinestars-negra_atras",
+          "vista": "Atrás"
+        }
       ],
       "fotosReales": []
     },
@@ -147,15 +151,23 @@
       "id": "ariat-negra",
       "nombre": "Ariat negra",
       "marca": "Ariat",
-      "precio": null,
-      "tallas": ["S/M"],
+      "precio": 185000,
+      "tallas": [
+        "S/M"
+      ],
       "ajuste": "Flexfit",
       "estado": "por-llegar",
       "nueva": true,
       "nota": "Escudo Ariat negro sobre negro al frente.",
       "fotos": [
-        { "archivo": "ariat-negra_frente", "vista": "Frente" },
-        { "archivo": "ariat-negra_atras", "vista": "Atrás" }
+        {
+          "archivo": "ariat-negra_frente",
+          "vista": "Frente"
+        },
+        {
+          "archivo": "ariat-negra_atras",
+          "vista": "Atrás"
+        }
       ],
       "fotosReales": []
     },
@@ -163,15 +175,23 @@
       "id": "fox-trucker-negra",
       "nombre": "Fox trucker negra",
       "marca": "Fox Racing",
-      "precio": null,
-      "tallas": ["S/M"],
+      "precio": 185000,
+      "tallas": [
+        "S/M"
+      ],
       "ajuste": "Snapback (correa ajustable)",
       "estado": "por-llegar",
       "nueva": true,
       "nota": "Zorro rosado al frente; malla atrás con correa ajustable.",
       "fotos": [
-        { "archivo": "fox-trucker-negra-zorro-rosado_frente", "vista": "Frente" },
-        { "archivo": "fox-trucker-negra-zorro-rosado_atras", "vista": "Atrás" }
+        {
+          "archivo": "fox-trucker-negra-zorro-rosado_frente",
+          "vista": "Frente"
+        },
+        {
+          "archivo": "fox-trucker-negra-zorro-rosado_atras",
+          "vista": "Atrás"
+        }
       ],
       "fotosReales": []
     },
@@ -179,31 +199,142 @@
       "id": "fox-gris-claro-speed-division",
       "nombre": "Fox blanca Speed Division",
       "marca": "Fox Racing",
-      "precio": null,
-      "tallas": ["S/M"],
+      "precio": 185000,
+      "tallas": [
+        "S/M"
+      ],
       "ajuste": "Flexfit",
       "estado": "por-llegar",
       "nueva": true,
       "nota": "Parche redondo «Speed Division · Fox Racing» al frente.",
       "fotos": [
-        { "archivo": "fox-gris-claro-speed-division_frente", "vista": "Frente" },
-        { "archivo": "fox-gris-claro-speed-division_atras", "vista": "Atrás" }
+        {
+          "archivo": "fox-gris-claro-speed-division_frente",
+          "vista": "Frente"
+        },
+        {
+          "archivo": "fox-gris-claro-speed-division_atras",
+          "vista": "Atrás"
+        }
       ],
       "fotosReales": []
+    },
+    {
+      "id": "fox-roja",
+      "nombre": "Fox roja",
+      "marca": "Fox Racing",
+      "precio": 185000,
+      "tallas": [
+        "S/M"
+      ],
+      "ajuste": "Flexfit",
+      "estado": "encargo",
+      "nueva": false,
+      "nota": "Cabeza de zorro negra al frente. Su etiqueta dice «Fox TruDri – Performance fabric».",
+      "fotos": [
+        {
+          "archivo": "fox-roja_frente",
+          "vista": "Frente"
+        }
+      ],
+      "fotosReales": [
+        {
+          "archivo": "IMG_0249",
+          "vista": "Frente"
+        },
+        {
+          "archivo": "IMG_0251",
+          "vista": "Frente, otro ángulo"
+        }
+      ]
+    },
+    {
+      "id": "fox-blanca",
+      "nombre": "Fox blanca",
+      "marca": "Fox Racing",
+      "precio": 185000,
+      "tallas": [
+        "S/M"
+      ],
+      "ajuste": "Flexfit",
+      "estado": "encargo",
+      "nueva": false,
+      "nota": "Logo FOX grande en azul de lado a lado; zorro azul atrás.",
+      "fotos": [
+        {
+          "archivo": "fox-blanca_frente",
+          "vista": "Frente"
+        },
+        {
+          "archivo": "fox-blanca_atras",
+          "vista": "Atrás"
+        }
+      ],
+      "fotosReales": [
+        {
+          "archivo": "IMG_0246",
+          "vista": "Frente"
+        },
+        {
+          "archivo": "IMG_0240",
+          "vista": "Atrás"
+        }
+      ]
+    },
+    {
+      "id": "fox-negra-logo-gris",
+      "nombre": "Fox negra",
+      "marca": "Fox Racing",
+      "precio": 185000,
+      "tallas": [
+        "S/M"
+      ],
+      "ajuste": "Flexfit",
+      "estado": "encargo",
+      "nueva": false,
+      "nota": "Logo FOX grande en gris; zorro gris atrás.",
+      "fotos": [
+        {
+          "archivo": "fox-negra-logo-gris_frente",
+          "vista": "Frente"
+        },
+        {
+          "archivo": "fox-negra-logo-gris_atras",
+          "vista": "Atrás"
+        }
+      ],
+      "fotosReales": [
+        {
+          "archivo": "IMG_0261",
+          "vista": "Frente"
+        },
+        {
+          "archivo": "IMG_0262",
+          "vista": "Atrás"
+        }
+      ]
     },
     {
       "id": "fox-negra-malla",
       "nombre": "Fox negra de malla",
       "marca": "Fox Racing",
-      "precio": null,
-      "tallas": ["S/M"],
+      "precio": 185000,
+      "tallas": [
+        "S/M"
+      ],
       "ajuste": "Flexfit",
-      "estado": "por-llegar",
-      "nueva": true,
+      "estado": "encargo",
+      "nueva": false,
       "nota": "Tela de malla; zorro negro al frente.",
       "fotos": [
-        { "archivo": "fox-negra-zorro-negro_frente", "vista": "Frente" },
-        { "archivo": "fox-negra-zorro-negro_atras", "vista": "Atrás" }
+        {
+          "archivo": "fox-negra-zorro-negro_frente",
+          "vista": "Frente"
+        },
+        {
+          "archivo": "fox-negra-zorro-negro_atras",
+          "vista": "Atrás"
+        }
       ],
       "fotosReales": []
     }

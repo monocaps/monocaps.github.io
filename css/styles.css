@@ -134,12 +134,44 @@ body.paso-portada .cabecera::before { opacity: 1; }
   color: var(--blanco);
   text-decoration: none;
   display: flex;
-  gap: .18em;
-  opacity: 0;
-  transition: opacity .4s;
+  align-items: center;
+  gap: 10px;
 }
-.marca span { color: var(--blanco); }
-body.paso-portada .marca, body.menu-abierto .marca { opacity: 1; }
+/* el logo siempre visible; el nombre aparece al pasar la portada (ahí ya lo dice el título) */
+.marca__logo { width: 40px; height: 40px; border-radius: 50%; transition: transform .5s var(--curva); }
+.marca:active .marca__logo { transform: rotate(-12deg) scale(.94); }
+.marca__texto { opacity: 0; translate: -8px 0; transition: opacity .4s, translate .4s var(--curva); }
+body.paso-portada .marca__texto, body.menu-abierto .marca__texto { opacity: 1; translate: 0 0; }
+
+/* ---------- Sello "Vendida": parche bordado como el logo ---------- */
+.sello {
+  position: absolute; z-index: 4; right: 2%; top: 4%;
+  width: 36%; aspect-ratio: 1;
+  border-radius: 50%;
+  background: #1b2440;
+  border: 3px solid var(--rojo);
+  box-shadow: inset 0 0 0 3px #1b2440, inset 0 0 0 4.5px rgba(255,255,255,.75);
+  display: grid; place-items: center;
+  rotate: -14deg;
+  pointer-events: none;
+}
+.sello::before { /* puntada interior */
+  content: ""; position: absolute; inset: 9%; border-radius: 50%;
+  border: 1.5px dashed rgba(255,255,255,.55);
+}
+.sello__txt { display: grid; justify-items: center; line-height: 1; text-transform: uppercase; color: #f1ead8; }
+.sello__txt b { font: 400 clamp(15px, 5.2cqw, 30px)/1 var(--display); letter-spacing: .02em; font-weight: 400; }
+.sello__txt i { font: 600 clamp(8px, 2.2cqw, 12px)/1 var(--cond); letter-spacing: .12em; font-style: normal; margin-top: 4px; color: rgba(241,234,216,.8); }
+.flota, .desfile__flota, .detalle__galeria { container-type: inline-size; }
+.tarjeta .sello { width: 40%; border-width: 2px; }
+.sello.pega { animation: pega .7s .35s cubic-bezier(.3, 1.6, .5, 1) both; }
+@keyframes pega {
+  from { opacity: 0; scale: 2.2; rotate: 18deg; }
+  to { opacity: 1; scale: 1; rotate: -14deg; }
+}
+.sello--detalle { right: 8%; top: 9%; width: 30%; }
+
+.pie__logo { width: 96px; height: 96px; margin-bottom: 18px; }
 .hamburguesa { width: 48px; height: 48px; margin-right: -12px; position: relative; }
 .hamburguesa span {
   position: absolute; left: 12px; right: 12px; height: 1.5px; background: var(--blanco);
@@ -462,7 +494,7 @@ body.paso-portada .marca, body.menu-abierto .marca { opacity: 1; }
 
 /* ---------- Pie ---------- */
 .pie { padding: var(--seccion) var(--margen) calc(110px + var(--abajo)); display: grid; gap: 10px; }
-.pie__marca { font: 400 clamp(84px, 25vw, 260px)/.82 var(--display); color: var(--blanco); letter-spacing: -.01em; }
+.pie__marca { font: 400 clamp(60px, 20.5vw, 230px)/.82 var(--display); color: var(--blanco); letter-spacing: -.01em; }
 .pie__frase { font: 600 18px/1.1 var(--cond); letter-spacing: .08em; text-transform: uppercase; color: var(--ceniza); margin-bottom: 8px; }
 .pie__legal { font-size: 13px; color: var(--humo); max-width: 52ch; }
 .pie__legal:last-child { color: var(--grafito); }
@@ -622,4 +654,9 @@ html:not(.js) .portada__frase, html:not(.js) .portada__sub, html:not(.js) .porta
 
 /* pausa durante el salto del desfile: corta el impulso del scroll */
 html { scrollbar-gutter: stable; }
+
+
+/* seguro: nada puede ensanchar la página más que la pantalla (clip no rompe la escena fija) */
+html, body { overflow-x: clip; }
+.desfile__flota .sello { right: auto; left: -2%; top: 2%; }
 

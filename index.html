@@ -13,13 +13,13 @@
   <meta property="og:site_name" content="Mono Caps">
   <meta property="og:title" content="Mono Caps — Se ve mejor desde arriba.">
   <meta property="og:description" content="Gorras Fox Racing, Hurley, Alpinestars y Ariat. Pide por WhatsApp. Entrega gratis en Pereira y Supía, envíos a toda Colombia.">
-  <meta property="og:image" content="https://monyllo77-spec.github.io/monocaps/og.jpg">
+  <meta property="og:image" content="https://monyllo77-spec.github.io/monocaps/og.jpg?v=2">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:url" content="https://monyllo77-spec.github.io/monocaps/">
   <meta name="twitter:card" content="summary_large_image">
 
-  <link rel="icon" href="img/icono.png" type="image/png">
+  <link rel="icon" href="img/logo.png" type="image/png">
   <link rel="apple-touch-icon" href="img/icono.png">
   <link rel="preload" href="fonts/anton-400.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="img/portada/portada-sm.webp" as="image" media="(max-width: 600px)">
@@ -31,7 +31,7 @@
 
   <!-- ============ CABECERA ============ -->
   <header class="cabecera">
-    <a class="marca" href="#" aria-label="Mono Caps, inicio">MONO<span>CAPS</span></a>
+    <a class="marca" href="#" aria-label="Mono Caps, inicio"><img class="marca__logo" src="img/logo-sm.webp" alt="" width="40" height="40"><span class="marca__texto">MONO CAPS</span></a>
     <button class="hamburguesa" aria-label="Abrir menú" aria-expanded="false" aria-controls="menu">
       <span></span><span></span>
     </button>
@@ -100,6 +100,7 @@
               <canvas class="burbuja" data-burbuja="desfile" aria-hidden="true"></canvas>
               <img class="flota__gorra" data-df-img alt="">
               <canvas class="burbuja burbuja--frente" data-burbuja-frente="desfile" aria-hidden="true"></canvas>
+              <span class="sello" data-df-sello hidden aria-hidden="true"><span class="sello__txt"><b>Vendida</b><i>por encargo</i></span></span>
             </a>
             <ol class="desfile__indice" data-df-indice aria-label="Ir a una gorra"></ol>
           </div>
@@ -171,6 +172,7 @@
 
   <!-- ============ PIE ============ -->
   <footer class="pie">
+    <img class="pie__logo" src="img/logo.png" alt="Logo de Mono Caps" width="128" height="128" loading="lazy">
     <p class="pie__marca">MONO CAPS</p>
     <p class="pie__frase">Se ve mejor desde arriba.</p>
     <p><a class="enlace" data-wa-general href="#">WhatsApp <span data-wa-numero></span></a></p>
@@ -204,6 +206,7 @@
         <canvas class="burbuja detalle__burbuja" data-burbuja="detalle" aria-hidden="true"></canvas>
         <div class="carril" data-d-carril></div>
         <canvas class="burbuja burbuja--frente detalle__burbuja" data-burbuja-frente="detalle" aria-hidden="true"></canvas>
+        <span class="sello sello--detalle" data-d-sello hidden aria-hidden="true"><span class="sello__txt"><b>Vendida</b><i>por encargo</i></span></span>
         <p class="carril__indice" data-d-indice></p>
       </div>
       <div class="detalle__reales" data-panel="real" hidden>

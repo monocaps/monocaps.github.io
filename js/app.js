@@ -14,7 +14,8 @@
     'disponible': 'Disponible',
     'ultimas': 'Últimas unidades',
     'agotada': 'Agotada',
-    'por-llegar': 'Por llegar'
+    'por-llegar': 'Por llegar',
+    'encargo': 'Vendida · por encargo'
   };
 
   var tienda, gorras = [];
@@ -280,6 +281,11 @@
     df.img.alt = g.nombre;
     df.flota.setAttribute('aria-label', 'Ver ' + g.nombre);
     df.flota.classList.toggle('desfile__flota--agotada', g.estado === 'agotada');
+    // vendida: el parche bordado cae sobre la burbuja como un sello
+    var sello = $('[data-df-sello]');
+    sello.hidden = g.estado !== 'encargo';
+    sello.classList.remove('pega');
+    if (!sello.hidden) { void sello.offsetWidth; sello.classList.add('pega'); }
     $('[data-df-num]').textContent = num(g);
     $('[data-df-marca]').textContent = g.marca;
     $('[data-df-nombre]').innerHTML = letras(g.nombre);
@@ -311,7 +317,8 @@
     var ya = contar(function (g) { return g.estado === 'disponible' || g.estado === 'ultimas'; });
     var vienen = contar(function (g) { return g.estado === 'por-llegar'; });
     $('[data-resumen]').textContent = gorras.length + ' gorras' +
-      (ya ? ' · ' + ya + ' disponibles' : '') + (vienen ? ' · ' + vienen + ' en camino' : '') + '. Todas talla S/M.';
+      (ya ? ' · ' + ya + ' disponibles' : '') + (vienen ? ' · ' + vienen + ' en camino' : '') +
+      (contar(function (g) { return g.estado === 'encargo'; }) ? ' · ' + contar(function (g) { return g.estado === 'encargo'; }) + ' por encargo' : '') + '. Todas talla S/M.';
     $('[data-rejilla]').hidden = modoDesfile;
     if (modoDesfile) {
       var antes = df.lista.length;
@@ -337,8 +344,12 @@
 
     var ya = contar(function (g) { return g.estado === 'disponible' || g.estado === 'ultimas'; });
     var vienen = contar(function (g) { return g.estado === 'por-llegar'; });
-    $('[data-filtro-estado]').innerHTML = (ya && vienen)
-      ? chip('estado', 'todos', 'Todo') + chip('estado', 'ya', 'Disponibles ahora', ya) + chip('estado', 'por-llegar', 'Por llegar', vienen)
+    var encargo = contar(function (g) { return g.estado === 'encargo'; });
+    $('[data-filtro-estado]').innerHTML = [ya, vienen, encargo].filter(Boolean).length > 1
+      ? chip('estado', 'todos', 'Todo') +
+        (ya ? chip('estado', 'ya', 'Disponibles ahora', ya) : '') +
+        (vienen ? chip('estado', 'por-llegar', 'Por llegar', vienen) : '') +
+        (encargo ? chip('estado', 'encargo', 'Por encargo', encargo) : '')
       : '';
 
     var tallas = [];
@@ -375,6 +386,7 @@
       if (filtros.talla !== 'todas' && g.tallas.indexOf(filtros.talla) < 0) return false;
       if (filtros.estado === 'ya' && !(g.estado === 'disponible' || g.estado === 'ultimas')) return false;
       if (filtros.estado === 'por-llegar' && g.estado !== 'por-llegar') return false;
+      if (filtros.estado === 'encargo' && g.estado !== 'encargo') return false;
       return true;
     });
     if (filtros.orden !== 'normal') {
@@ -401,7 +413,7 @@
         '<a href="#/gorra/' + esc(g.id) + '">' +
         '<div class="tarjeta__escena">' +
         '<span class="tarjeta__num">' + num(g) + '</span>' +
-        '<div class="flota">' +
+        '<div class="flota">' + (g.estado === 'encargo' ? '<span class="sello" aria-hidden="true"><span class="sello__txt"><b>Vendida</b><i>por encargo</i></span></span>' : '') +
         '<canvas class="burbuja" aria-hidden="true"></canvas>' +
         '<img class="flota__gorra" src="' + foto(g.fotos[0].archivo, true) + '" alt="" loading="lazy" decoding="async" width="400" height="400">' +
         '<canvas class="burbuja burbuja--frente" aria-hidden="true"></canvas>' +
@@ -539,6 +551,8 @@
     pestana('producto');
 
     var avisos = ['Entrega gratis en ' + tienda.entregaGratis.join(' y '), tienda.envios, tienda.promo];
+    if (g.estado === 'encargo') avisos.unshift('Esta ya se vendió. Escríbeme y te confirmo si te la puedo conseguir, cuánto tarda y el precio.');
+    $('[data-d-sello]').hidden = g.estado !== 'encargo';
     $('[data-d-avisos]').innerHTML = avisos.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('');
 
     var boton = $('[data-d-wa]');
@@ -548,8 +562,9 @@
       $('[data-d-wa-texto]').textContent = 'Agotada';
     } else {
       boton.removeAttribute('aria-disabled');
-      boton.href = wa(rellenar(g.estado === 'por-llegar' ? tienda.mensajeApartar : tienda.mensajePedir, g));
-      $('[data-d-wa-texto]').textContent = g.estado === 'por-llegar' ? 'Apartar por WhatsApp' : 'Pedir por WhatsApp';
+      var tipo = g.estado === 'por-llegar' ? 'Apartar' : g.estado === 'encargo' ? 'Encargar' : 'Pedir';
+      boton.href = wa(rellenar(tipo === 'Apartar' ? tienda.mensajeApartar : tipo === 'Encargar' ? (tienda.mensajeEncargo || tienda.mensajePedir) : tienda.mensajePedir, g));
+      $('[data-d-wa-texto]').textContent = tipo + ' por WhatsApp';
     }
 
     document.title = g.nombre + ' — Mono Caps';

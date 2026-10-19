@@ -42,7 +42,7 @@ tools/                scripts para procesar fotos (no hacen parte de la página)
   "precio": null,                   ← null = "Precio por confirmar". Con precio: 185000 (sin puntos ni $)
   "tallas": ["S/M"],                ← si algún día hay más: ["S/M", "L/XL"] y aparece el filtro de talla
   "ajuste": "Flexfit",
-  "estado": "disponible",           ← disponible | ultimas | agotada | por-llegar
+  "estado": "disponible",           ← disponible | ultimas | por-llegar | encargo | agotada
   "nueva": false,                   ← true muestra la etiqueta NUEVA
   "nota": "Texto corto opcional",
   "fotos": [ { "archivo": "fox-roja_frente", "vista": "Frente" } ],
@@ -55,6 +55,7 @@ tools/                scripts para procesar fotos (no hacen parte de la página)
 - `ultimas`: muestra "Últimas unidades".
 - `agotada`: se ve atenuada y el botón queda desactivado.
 - `por-llegar`: el botón dice "Apartar por WhatsApp".
+- `encargo`: ya se vendió, pero se puede encargar. Sale con el parche "VENDIDA · por encargo" y el botón dice "Encargar por WhatsApp" (mensaje en `mensajeEncargo`).
 
 **Ordenar:** las gorras salen en el orden del archivo, y el número #01, #02… también sale de ese orden.
 
@@ -122,7 +123,9 @@ y abre http://localhost:8000
 
 ## Pendiente por confirmar
 
-- Precios de todas las gorras (hoy dicen "Precio por confirmar").
-- Estado real de cada gorra (las 6 que ya tienes están como `disponible` de forma provisional).
-- Ajuste de la Alpinestars, la Fox gris claro Speed Division y la Fox negra de malla (marcadas Flexfit según lo que dijiste; confírmalo cuando lleguen).
-- Usuarios de Instagram y TikTok.
+- Usuarios de Instagram y TikTok (`instagram` y `tiktok` en `productos.json`).
+- Fotos reales del mirador de las gorras que vienen en camino, cuando lleguen.
+
+## Logo
+
+El original está en `marca/logo-original.png`. Si cambia: `python tools/procesar_logo.py marca/logo-original.png` y luego `python tools/imagen_compartir.py <IMG_0230.jpg>`.
