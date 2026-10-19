@@ -99,8 +99,8 @@ Los scripts necesitan Python con: `pip install pillow "rembg[cpu]"`
 
 ## 3. Dónde está publicado
 
-- Página: **https://monyllo77-spec.github.io/monocaps/** (este es el link para la bio de Instagram y TikTok)
-- Repositorio: https://github.com/monyllo77-spec/monocaps
+- Página: **https://monocaps.github.io/** (este es el link para la bio de Instagram y TikTok)
+- Repositorio: https://github.com/monocaps/monocaps.github.io
 - GitHub Pages publica la rama **main**, carpeta **/ (root)** (Settings → Pages).
 
 **Para actualizar después:** edita `data/productos.json` en GitHub con el lápiz, o sube fotos nuevas con **Add file → Upload files** dentro de la carpeta correspondiente (`img/mirador/`, `img/productos/`…).
