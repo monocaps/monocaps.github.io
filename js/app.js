@@ -66,9 +66,9 @@
       tienda = datos.tienda;
       gorras = datos.gorras;
       montarTienda();
-      montarVitrina();
+      if (modoDesfile) montarDesfile();
       montarFiltros();
-      pintarRejilla();
+      pintarColeccion();
       montarDetalle();
       ruta();
     })
@@ -108,141 +108,165 @@
     $('[data-anio]').textContent = new Date().getFullYear();
   }
 
-  /* ---------- vitrina: la burbuja grande que sigue el dedo ---------- */
-  var vitrina = { i: 0, timer: null, pausa: 0, ocupada: false };
-  function montarVitrina() {
-    var lista = gorras.filter(sePuedePedir);
-    if (!lista.length) { $('.vitrina').hidden = true; return; }
-    vitrina.lista = lista;
-    vitrina.flota = $('[data-v-flota]');
-    vitrina.burbuja = window.Burbujas.registrar($('[data-burbuja="vitrina"]'), {
-      frente: $('[data-burbuja-frente="vitrina"]'), semilla: 2.4, prioridad: true, sensible: 0.6
+  /* ---------- desfile: una burbuja que salta en diagonal al bajar ----------
+     La pantalla queda fija mientras bajas. En cada paso la burbuja se queda quieta un rato,
+     luego se aleja (zoom), salta en diagonal a la esquina contraria y en la mitad del salto
+     cambia la gorra. El scroll se suaviza para que el salto se sienta como un "pum". */
+  var df = { lista: [], ps: 0, activo: -1, ux: 0, uy: 0, corriendo: false, visible: false };
+  var ESQUINAS = [{ x: -0.15, y: -0.12 }, { x: 0.13, y: 0.12 }];
+  function suave(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+  function rebote(t) { var c = 1.7; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); }
+
+  function montarDesfile() {
+    df.el = $('[data-desfile]');
+    df.zona = $('[data-df-zona]');
+    df.flota = $('[data-df-flota]');
+    df.img = $('[data-df-img]');
+    df.texto = $('[data-df-texto]');
+    df.burbuja = window.Burbujas.registrar($('[data-burbuja="desfile"]'), {
+      frente: $('[data-burbuja-frente="desfile"]'), semilla: 3.3, prioridad: true, sensible: 0.35
     });
-    $('[data-v-total]').textContent = String(lista.length).padStart(2, '0');
-    mostrarVitrina(0, 0);
-
-    $('[data-v-prev]').addEventListener('click', function () { tocarVitrina(-1); });
-    $('[data-v-next]').addEventListener('click', function () { tocarVitrina(1); });
-
-    // arrastre: la burbuja sigue el dedo, se estira como líquido y al soltar sale hacia ese lado
-    var escena = $('[data-v-escena]'), flota = vitrina.flota;
-    var arr = null;
-    escena.addEventListener('pointerdown', function (e) {
-      if (e.target.closest('button') || vitrina.ocupada) return;
-      arr = { x0: e.clientX, y0: e.clientY, x: e.clientX, vx: 0, decidido: false, horizontal: false, id: e.pointerId };
+    df.flota.addEventListener('click', function (e) {
+      e.preventDefault();
+      var g = df.lista[df.activo];
+      if (!g) return;
+      df.burbuja.pulso(1);
+      fijarOrigen(df.flota);
+      location.hash = '#/gorra/' + g.id;
     });
-    escena.addEventListener('pointermove', function (e) {
-      if (!arr || e.pointerId !== arr.id) return;
-      var dx = e.clientX - arr.x0, dy = e.clientY - arr.y0;
-      if (!arr.decidido && (Math.abs(dx) > 6 || Math.abs(dy) > 6)) {
-        arr.decidido = true;
-        arr.horizontal = Math.abs(dx) > Math.abs(dy);
-        if (arr.horizontal) { try { escena.setPointerCapture(e.pointerId); } catch (err) {} }
-      }
-      if (!arr.horizontal) return;
-      arr.vx = e.clientX - arr.x;
-      arr.x = e.clientX;
-      flota.style.transition = 'none';
-      flota.style.translate = (dx * 0.9) + 'px 0';
-      flota.style.setProperty('--gx', dx * 0.9);
-      vitrina.burbuja.empujar(-arr.vx / 22, 0);
+    $('[data-df-indice]').addEventListener('click', function (e) {
+      var b = e.target.closest('button');
+      if (!b) return;
+      medirDesfile();
+      window.scrollTo({ top: df.top + (+b.dataset.i) * df.paso + 2, behavior: 'smooth' });
     });
-    function soltar(e) {
-      if (!arr || e.pointerId !== arr.id) return;
-      var dx = e.clientX - arr.x0, dy = e.clientY - arr.y0, vx = arr.vx, horizontal = arr.horizontal;
-      arr = null;
-      if (horizontal && (Math.abs(dx) > 70 || Math.abs(vx) > 9)) {
-        vitrina.pausa = Date.now() + 12000;
-        cambiarVitrina(dx < 0 ? 1 : -1);
-        programarVitrina();
-      } else if (horizontal) {
-        // no alcanzó: vuelve al centro rebotando
-        flota.style.transition = 'translate .7s cubic-bezier(.2, 1.5, .4, 1)';
-        flota.style.translate = '0px 0';
-        flota.style.setProperty('--gx', 0);
-        vitrina.burbuja.empujar(dx > 0 ? 0.45 : -0.45, 0);
-      } else if (e.type === 'pointerup' && Math.abs(dx) < 8 && Math.abs(dy) < 8) {
-        fijarOrigen(escena);
-        location.hash = '#/gorra/' + vitrina.lista[vitrina.i].id;
-      }
-    }
-    escena.addEventListener('pointerup', soltar);
-    escena.addEventListener('pointercancel', soltar);
+    new IntersectionObserver(function (ents) {
+      df.visible = ents[0].isIntersecting;
+      if (df.visible) { medirDesfile(); moverDesfile(); }
+    }).observe(df.el);
+    window.addEventListener('resize', function () { medirDesfile(); df.activo = -1; pintarCuadro(df.ps); });
+  }
 
-    var io = new IntersectionObserver(function (ents) {
-      vitrina.visible = ents[0].isIntersecting;
-      programarVitrina();
-    }, { threshold: .35 });
-    io.observe(escena);
+  function pintarDesfile() {
+    var l = filtradas();
+    df.lista = l;
+    df.el.hidden = !l.length;
+    $('[data-vacia]').hidden = l.length > 0;
+    if (!l.length) return;
+    df.el.style.setProperty('--n', l.length);
+    $('[data-df-indice]').innerHTML = l.map(function (g, i) {
+      return '<li><button data-i="' + i + '" aria-label="' + esc(g.nombre) + '">' + num(g).slice(1) + '</button></li>';
+    }).join('');
+    df.activo = -1;
+    medirDesfile();
+    df.ps = objetivoDesfile();
+    pintarCuadro(df.ps);
   }
-  function tocarVitrina(dir) {
-    vitrina.pausa = Date.now() + 12000;
-    cambiarVitrina(dir);
-    programarVitrina();
-  }
-  function programarVitrina() {
-    clearTimeout(vitrina.timer);
-    if (!vitrina.visible || reducido) return;
-    var espera = Math.max(4800, vitrina.pausa - Date.now());
-    vitrina.timer = setTimeout(function () {
-      if (document.hidden || $('.detalle').classList.contains('abierto')) { programarVitrina(); return; }
-      cambiarVitrina(1);
-      programarVitrina();
-    }, espera);
-  }
-  // dir 1 = siguiente (la burbuja sale por la izquierda y la nueva entra por la derecha)
-  function cambiarVitrina(dir) {
-    if (vitrina.ocupada) return;
-    if (reducido) { mostrarVitrina(vitrina.i + dir, dir); return; }
-    vitrina.ocupada = true;
-    var flota = vitrina.flota, b = vitrina.burbuja;
-    var lado = dir > 0 ? -1 : 1; // hacia dónde se mueve en pantalla
-    var siguiente = vitrina.lista[(vitrina.i + dir + vitrina.lista.length) % vitrina.lista.length];
-    var cargada = new Image();
-    cargada.src = foto(siguiente.fotos[0].archivo);
 
-    $('.vitrina__nombre').classList.add('cambia');
-    flota.style.transition = 'translate .45s cubic-bezier(.55, 0, .85, .35)';
-    flota.style.translate = (lado * 118) + '% 0';
-    flota.style.setProperty('--gx', lado * 40);
-    b.empujar(-lado * 0.65, 0);
-    b.pulso(0.6);
-
-    setTimeout(function () {
-      (cargada.decode ? cargada.decode() : Promise.resolve()).catch(function () {}).then(function () {
-        mostrarVitrina(vitrina.i + dir, dir);
-        flota.style.transition = 'none';
-        flota.style.translate = (-lado * 118) + '% 0';
-        void flota.offsetWidth;
-        flota.style.transition = 'translate .95s cubic-bezier(.16, 1.22, .3, 1)';
-        flota.style.translate = '0px 0';
-        flota.style.setProperty('--gx', 0);
-        b.empujar(-lado * 0.6, 0);
-        setTimeout(function () { vitrina.ocupada = false; }, 500);
-      });
-    }, 450);
+  function medirDesfile() {
+    // la escena fija mide 100svh; cada gorra ocupa el 80 % de esa altura de scroll
+    var esc = $('.desfile__escenario').clientHeight || window.innerHeight;
+    df.paso = esc * 0.8;
+    df.el.style.height = (esc + df.lista.length * df.paso) + 'px';
+    var r = df.el.getBoundingClientRect();
+    df.top = r.top + window.scrollY;
+    df.zw = df.zona.clientWidth;
+    df.zh = df.zona.clientHeight;
   }
-  function mostrarVitrina(i) {
-    var n = vitrina.lista.length;
-    vitrina.i = (i + n) % n;
-    var g = vitrina.lista[vitrina.i];
-    var img = $('[data-v-img]');
-    var nombre = $('.vitrina__nombre');
-    img.src = foto(g.fotos[0].archivo);
-    img.alt = g.nombre;
-    $('[data-v-actual]').textContent = String(vitrina.i + 1).padStart(2, '0');
-    $('[data-v-marca]').textContent = g.marca;
-    $('[data-v-nombre]').textContent = g.nombre;
-    $('[data-v-estado]').innerHTML = etiquetas(g) + ' <span class="nota">&nbsp;' + esc(precio(g)) + '</span>';
-    var ver = $('[data-v-ver]');
+  function objetivoDesfile() {
+    return Math.max(0, Math.min(df.lista.length - 1, (window.scrollY - df.top) / df.paso));
+  }
+  function moverDesfile() {
+    if (df.corriendo || !df.lista.length) return;
+    df.corriendo = true;
+    requestAnimationFrame(function paso() {
+      var obj = objetivoDesfile();
+      df.ps += (obj - df.ps) * 0.16;
+      if (Math.abs(obj - df.ps) < 0.0008) df.ps = obj;
+      pintarCuadro(df.ps);
+      if (df.ps !== obj || df.visible && Math.abs(obj - objetivoDesfile()) > 0) requestAnimationFrame(paso);
+      else df.corriendo = false;
+    });
+  }
+
+  function pintarCuadro(p) {
+    var n = df.lista.length;
+    if (!n) return;
+    var k = Math.min(Math.floor(p), n - 1), f = p - k;
+    if (k >= n - 1) { k = n - 1; f = 0; }
+    // el salto ocurre en el último 55 % de cada paso; antes, la burbuja descansa
+    var t = Math.max(0, Math.min(1, (f - 0.45) / 0.55));
+    var e = suave(t);
+    var A = ESQUINAS[k % 2], B = ESQUINAS[(k + 1) % 2];
+    var x = (A.x + (B.x - A.x) * e) * df.zw;
+    var y = (A.y + (B.y - A.y) * e) * df.zh;
+    var s = 1 - 0.4 * Math.sin(Math.PI * e);
+    df.flota.style.transform = 'translate3d(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px,0) scale(' + s.toFixed(3) + ')';
+
+    // el líquido se queda atrás en la dirección del salto
+    var vx = x - df.ux, vy = y - df.uy;
+    df.ux = x; df.uy = y;
+    if (Math.abs(vx) + Math.abs(vy) > 0.6) df.burbuja.empujar(-vx / 12, -vy / 12);
+
+    // la gorra se va en la primera mitad del salto y la nueva aparece en la segunda
+    var cual = t < 0.5 ? k : k + 1, op, sc;
+    if (t < 0.5) { var a = t * 2; op = 1 - a * a; sc = 1 - 0.4 * a; }
+    else { var b = (t - 0.5) * 2; op = Math.min(1, b * 1.6); sc = 0.6 + 0.4 * rebote(b); }
+    df.img.style.opacity = op.toFixed(3);
+    df.img.style.scale = sc.toFixed(3);
+    df.img.style.filter = op < 0.98 ? 'blur(' + ((1 - op) * 6).toFixed(1) + 'px)' : '';
+    if (cual !== df.activo) textoDesfile(cual);
+  }
+
+  function textoDesfile(i) {
+    if (df.activo !== -1 && Math.abs(i - df.activo) === 1) df.burbuja.pulso(0.7);
+    df.activo = i;
+    var g = df.lista[i];
+    df.img.src = foto(g.fotos[0].archivo);
+    df.img.alt = g.nombre;
+    df.flota.setAttribute('aria-label', 'Ver ' + g.nombre);
+    df.flota.classList.toggle('desfile__flota--agotada', g.estado === 'agotada');
+    $('[data-df-num]').textContent = num(g);
+    $('[data-df-marca]').textContent = g.marca;
+    $('[data-df-nombre]').innerHTML = letras(g.nombre);
+    $('[data-df-meta]').innerHTML = etiquetas(g) + '<span class="desfile__precio">' + esc(precio(g)) + '</span>';
+    var ver = $('[data-df-ver]');
     ver.href = '#/gorra/' + g.id;
-    ver.onclick = function () { fijarOrigen($('[data-v-escena]')); };
-    void nombre.offsetWidth;
-    nombre.classList.remove('cambia');
-    // precarga la siguiente y la anterior
-    new Image().src = foto(vitrina.lista[(vitrina.i + 1) % n].fotos[0].archivo);
-    new Image().src = foto(vitrina.lista[(vitrina.i - 1 + n) % n].fotos[0].archivo);
+    ver.onclick = function () { fijarOrigen(df.flota); };
+    $$('button', $('[data-df-indice]')).forEach(function (b) { b.classList.toggle('activo', +b.dataset.i === i); });
+    // el texto se acomoda en la esquina contraria a la burbuja
+    df.texto.classList.toggle('desfile__texto--der', i % 2 === 0);
+    df.texto.classList.remove('entra');
+    void df.texto.offsetWidth;
+    df.texto.classList.add('entra');
+    // precarga la siguiente
+    if (df.lista[i + 1]) new Image().src = foto(df.lista[i + 1].fotos[0].archivo);
   }
+
+  // parte un texto en letras (sin cortar palabras) para animarlas una por una
+  function letras(texto) {
+    var n = 0;
+    return texto.split(' ').map(function (palabra) {
+      return '<span class="palabra">' + palabra.split('').map(function (c) {
+        return '<span class="letra" style="--i:' + (n++) + '">' + esc(c) + '</span>';
+      }).join('') + '</span>';
+    }).join(' ');
+  }
+
+  function pintarColeccion(animar) {
+    var ya = contar(function (g) { return g.estado === 'disponible' || g.estado === 'ultimas'; });
+    var vienen = contar(function (g) { return g.estado === 'por-llegar'; });
+    $('[data-resumen]').textContent = gorras.length + ' gorras' +
+      (ya ? ' · ' + ya + ' disponibles' : '') + (vienen ? ' · ' + vienen + ' en camino' : '') + '. Todas talla S/M.';
+    $('[data-rejilla]').hidden = modoDesfile;
+    if (modoDesfile) {
+      var antes = df.lista.length;
+      pintarDesfile();
+      // al cambiar un filtro, vuelve al inicio del desfile
+      if (antes && window.scrollY > df.top) window.scrollTo({ top: df.top - 120 });
+    } else pintarRejilla(animar);
+  }
+  var modoDesfile = !reducido;
 
   /* ---------- filtros ---------- */
   function contar(fn) { return gorras.filter(fn).length; }
@@ -285,10 +309,10 @@
       $$('.chip[data-grupo="' + b.dataset.grupo + '"]').forEach(function (c) {
         c.setAttribute('aria-pressed', String(c === b));
       });
-      pintarRejilla(true);
+      pintarColeccion(true);
     });
     var orden = $('[data-orden]');
-    if (orden) orden.addEventListener('change', function () { filtros.orden = orden.value; pintarRejilla(true); });
+    if (orden) orden.addEventListener('change', function () { filtros.orden = orden.value; pintarColeccion(true); });
   }
 
   function filtradas() {
@@ -316,10 +340,6 @@
     $$('canvas.burbuja:not(.burbuja--frente)', ul).forEach(function (c) { window.Burbujas.quitar(c); });
     vivas = [];
     var l = filtradas();
-    var ya = contar(function (g) { return g.estado === 'disponible' || g.estado === 'ultimas'; });
-    var vienen = contar(function (g) { return g.estado === 'por-llegar'; });
-    $('[data-resumen]').textContent = gorras.length + ' gorras' +
-      (ya ? ' · ' + ya + ' disponibles' : '') + (vienen ? ' · ' + vienen + ' en camino' : '') + '. Todas talla S/M.';
 
     ul.innerHTML = l.map(function (g, i) {
       return '<li class="tarjeta' + (g.estado === 'agotada' ? ' tarjeta--agotada' : '') + (animar ? ' entra' : ' revelar') +
@@ -655,7 +675,35 @@
   function observarRevelar(el) {
     if (ioRevelar) ioRevelar.observe(el); else el.classList.add('visible');
   }
-  $$('.revelar').forEach(observarRevelar);
+  // títulos grandes: cada letra sube por separado
+  $$('.titulo-seccion > span, .pie__marca').forEach(function (s) { s.innerHTML = letras(s.textContent); });
+  $$('.revelar, .pie__marca').forEach(observarRevelar);
+
+  /* ---------- textos que se mueven con el dedo ----------
+     Las líneas de los títulos se deslizan en direcciones opuestas según su altura en pantalla,
+     y la cinta de avisos se acelera (o se devuelve) con la velocidad del scroll. */
+  var titulos = $$('.titulo-seccion, .pie__marca');
+  function derivarTextos() {
+    if (reducido) return;
+    var alto = window.innerHeight;
+    titulos.forEach(function (h) {
+      var r = h.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > alto) return;
+      var c = (r.top + r.height / 2) / alto - 0.5; // -0.5 arriba … 0.5 abajo
+      h.style.setProperty('--deriva', (c * 70).toFixed(1));
+    });
+  }
+  var cinta = { x: 0, v: 0, el: $('[data-cinta]') };
+  (function moverCinta() {
+    if (!reducido && cinta.el.firstChild) {
+      cinta.v *= 0.92;
+      cinta.x -= 0.6 + cinta.v;
+      var mitad = cinta.el.scrollWidth / 2;
+      if (mitad) { if (cinta.x <= -mitad) cinta.x += mitad; if (cinta.x > 0) cinta.x -= mitad; }
+      cinta.el.style.transform = 'translate3d(' + cinta.x.toFixed(1) + 'px,0,0)';
+    }
+    if (!reducido) requestAnimationFrame(moverCinta);
+  })();
 
   /* ---------- scroll: paralaje de la portada y burbujas que se agitan ---------- */
   var portada = $('.portada'), yAnterior = window.scrollY, pendiente = false;
@@ -667,7 +715,9 @@
     document.body.classList.toggle('paso-portada', y > alto * 0.55);
     var v = y - yAnterior;
     if (Math.abs(v) > 1 && window.Burbujas) window.Burbujas.scroll(v);
-    if (!document.body.classList.contains('detalle-abierto')) balancear();
+    cinta.v = Math.max(-14, Math.min(14, cinta.v + v * 0.08));
+    derivarTextos();
+    if (!document.body.classList.contains('detalle-abierto')) { balancear(); if (modoDesfile) moverDesfile(); }
     yAnterior = y;
   }
   window.addEventListener('scroll', function () {
