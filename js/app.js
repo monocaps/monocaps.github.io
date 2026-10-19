@@ -109,11 +109,13 @@
   }
 
   /* ---------- desfile: una burbuja que salta en diagonal al bajar ----------
-     La pantalla queda fija mientras bajas. En cada paso la burbuja se queda quieta un rato,
-     luego se aleja (zoom), salta en diagonal a la esquina contraria y en la mitad del salto
-     cambia la gorra. El scroll se suaviza para que el salto se sienta como un "pum". */
-  var df = { lista: [], ps: 0, activo: -1, ux: 0, uy: 0, corriendo: false, visible: false };
+     La pantalla queda fija mientras bajas. Basta un deslizamiento corto (40 % de la pantalla)
+     para cruzar a la siguiente gorra; en ese momento el salto se dispara solo y dura siempre
+     lo mismo: la burbuja se aleja (zoom), salta en diagonal a la esquina contraria y en la
+     mitad del salto cambia la gorra. Si deslizas rápido, va directo a donde te detengas. */
+  var df = { lista: [], actual: 0, salto: null, pendiente: false, activo: -1, ux: 0, uy: 0 };
   var ESQUINAS = [{ x: -0.15, y: -0.12 }, { x: 0.13, y: 0.12 }];
+  var DURACION = 720; // ms que dura cada salto
   function suave(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
   function rebote(t) { var c = 1.7; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); }
 
@@ -138,13 +140,16 @@
       var b = e.target.closest('button');
       if (!b) return;
       medirDesfile();
-      window.scrollTo({ top: df.top + (+b.dataset.i) * df.paso + 2, behavior: 'smooth' });
+      window.scrollTo({ top: df.top + (+b.dataset.i + 0.2) * df.paso, behavior: 'smooth' });
     });
     new IntersectionObserver(function (ents) {
-      df.visible = ents[0].isIntersecting;
-      if (df.visible) { medirDesfile(); moverDesfile(); }
+      if (ents[0].isIntersecting) { medirDesfile(); moverDesfile(); }
     }).observe(df.el);
-    window.addEventListener('resize', function () { medirDesfile(); df.activo = -1; pintarCuadro(df.ps); });
+    window.addEventListener('resize', function () {
+      medirDesfile();
+      df.activo = -1;
+      if (!df.salto) pintarCuadro(df.actual, df.actual, 0);
+    });
   }
 
   function pintarDesfile() {
@@ -153,51 +158,53 @@
     df.el.hidden = !l.length;
     $('[data-vacia]').hidden = l.length > 0;
     if (!l.length) return;
-    df.el.style.setProperty('--n', l.length);
     $('[data-df-indice]').innerHTML = l.map(function (g, i) {
       return '<li><button data-i="' + i + '" aria-label="' + esc(g.nombre) + '">' + num(g).slice(1) + '</button></li>';
     }).join('');
-    df.activo = -1;
     medirDesfile();
-    df.ps = objetivoDesfile();
-    pintarCuadro(df.ps);
+    df.salto = null;
+    df.activo = -1;
+    df.actual = pasoActual();
+    pintarCuadro(df.actual, df.actual, 0);
   }
 
   function medirDesfile() {
-    // la escena fija mide 100svh; cada gorra ocupa el 80 % de esa altura de scroll
+    // la escena fija mide 100svh; cada gorra ocupa el 40 % de esa altura de scroll
     var esc = $('.desfile__escenario').clientHeight || window.innerHeight;
-    df.paso = esc * 0.8;
+    df.paso = esc * 0.4;
     df.el.style.height = (esc + df.lista.length * df.paso) + 'px';
     var r = df.el.getBoundingClientRect();
     df.top = r.top + window.scrollY;
     df.zw = df.zona.clientWidth;
     df.zh = df.zona.clientHeight;
   }
-  function objetivoDesfile() {
-    return Math.max(0, Math.min(df.lista.length - 1, (window.scrollY - df.top) / df.paso));
+  // la gorra cambia cuando llevas un 65 % del deslizamiento hacia la siguiente
+  function pasoActual() {
+    return Math.max(0, Math.min(df.lista.length - 1, Math.floor((window.scrollY - df.top) / df.paso + 0.35)));
   }
   function moverDesfile() {
-    if (df.corriendo || !df.lista.length) return;
-    df.corriendo = true;
-    requestAnimationFrame(function paso() {
-      var obj = objetivoDesfile();
-      df.ps += (obj - df.ps) * 0.16;
-      if (Math.abs(obj - df.ps) < 0.0008) df.ps = obj;
-      pintarCuadro(df.ps);
-      if (df.ps !== obj || df.visible && Math.abs(obj - objetivoDesfile()) > 0) requestAnimationFrame(paso);
-      else df.corriendo = false;
-    });
+    if (!df.lista.length) return;
+    if (df.salto) { df.pendiente = true; return; }
+    var k = pasoActual();
+    if (k === df.actual) return;
+    df.salto = { de: df.actual, a: k, t0: performance.now() };
+    requestAnimationFrame(animarSalto);
+  }
+  function animarSalto(ahora) {
+    var s = df.salto;
+    if (!s) return;
+    var t = Math.max(0, Math.min(1, (ahora - s.t0) / DURACION));
+    pintarCuadro(s.de, s.a, t);
+    if (t < 1) { requestAnimationFrame(animarSalto); return; }
+    df.actual = s.a;
+    df.salto = null;
+    if (df.pendiente) { df.pendiente = false; moverDesfile(); }
   }
 
-  function pintarCuadro(p) {
-    var n = df.lista.length;
-    if (!n) return;
-    var k = Math.min(Math.floor(p), n - 1), f = p - k;
-    if (k >= n - 1) { k = n - 1; f = 0; }
-    // el salto ocurre en el último 55 % de cada paso; antes, la burbuja descansa
-    var t = Math.max(0, Math.min(1, (f - 0.45) / 0.55));
+  function pintarCuadro(de, a, t) {
+    if (!df.lista.length) return;
     var e = suave(t);
-    var A = ESQUINAS[k % 2], B = ESQUINAS[(k + 1) % 2];
+    var A = ESQUINAS[de % 2], B = ESQUINAS[a % 2];
     var x = (A.x + (B.x - A.x) * e) * df.zw;
     var y = (A.y + (B.y - A.y) * e) * df.zh;
     var s = 1 - 0.4 * Math.sin(Math.PI * e);
@@ -209,9 +216,10 @@
     if (Math.abs(vx) + Math.abs(vy) > 0.6) df.burbuja.empujar(-vx / 12, -vy / 12);
 
     // la gorra se va en la primera mitad del salto y la nueva aparece en la segunda
-    var cual = t < 0.5 ? k : k + 1, op, sc;
-    if (t < 0.5) { var a = t * 2; op = 1 - a * a; sc = 1 - 0.4 * a; }
-    else { var b = (t - 0.5) * 2; op = Math.min(1, b * 1.6); sc = 0.6 + 0.4 * rebote(b); }
+    var cual = t < 0.5 ? de : a, op, sc;
+    if (de === a) { op = 1; sc = 1; }
+    else if (t < 0.5) { var p = t * 2; op = 1 - p * p; sc = 1 - 0.4 * p; }
+    else { var q = (t - 0.5) * 2; op = Math.min(1, q * 1.6); sc = 0.6 + 0.4 * rebote(q); }
     df.img.style.opacity = op.toFixed(3);
     df.img.style.scale = sc.toFixed(3);
     df.img.style.filter = op < 0.98 ? 'blur(' + ((1 - op) * 6).toFixed(1) + 'px)' : '';
@@ -219,7 +227,7 @@
   }
 
   function textoDesfile(i) {
-    if (df.activo !== -1 && Math.abs(i - df.activo) === 1) df.burbuja.pulso(0.7);
+    if (df.activo !== -1) df.burbuja.pulso(0.7);
     df.activo = i;
     var g = df.lista[i];
     df.img.src = foto(g.fotos[0].archivo);

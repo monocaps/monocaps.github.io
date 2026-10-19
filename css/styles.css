@@ -426,7 +426,8 @@ body.paso-portada .marca, body.menu-abierto .marca { opacity: 1; }
 .pasos__lista { margin-top: 34px; display: grid; gap: 30px; }
 .paso { display: grid; grid-template-columns: 76px 1fr; gap: 14px; align-items: start; border-top: 1px solid var(--linea); padding-top: 18px; }
 .paso__n {
-  font: 400 96px/.8 var(--display); color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,.6);
+  font: 400 96px/1 var(--display); color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,.6);
+  margin-top: -.12em; padding-bottom: .04em;
   background: linear-gradient(to top, #fff 50%, transparent 50%) 0 0 / 100% 200% no-repeat;
   -webkit-background-clip: text; background-clip: text;
   transition: background-position 1.2s var(--curva) .35s;
