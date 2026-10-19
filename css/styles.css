@@ -30,7 +30,7 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; scroll-padding-top: 64px; background: var(--negro); }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; scroll-padding-top: 64px; background: var(--negro); scroll-snap-type: y proximity; }
 body {
   margin: 0;
   background: var(--negro);
@@ -297,6 +297,9 @@ body.paso-portada .marca, body.menu-abierto .marca { opacity: 1; }
   display: grid; grid-template-rows: minmax(0, 1fr) auto;
 }
 .desfile__zona { position: relative; }
+/* puntos de parada: el navegador no deja pasar de largo ninguno en un solo deslizamiento */
+.desfile__paradas { position: absolute; inset: 0; pointer-events: none; }
+.desfile__paradas span { position: absolute; left: 0; width: 1px; height: 1px; scroll-snap-align: start; scroll-snap-stop: always; scroll-margin-top: 0; }
 .desfile__flota {
   --b: min(68vw, 44svh, 480px);
   inset: auto; left: 50%; top: calc(50% + 26px);
@@ -616,3 +619,8 @@ body.paso-portada .marca, body.menu-abierto .marca { opacity: 1; }
 html:not(.js) .portada__foto, html:not(.js) .portada__gorra { opacity: 1; }
 html:not(.js) .portada__titulo .linea > span { transform: none; }
 html:not(.js) .portada__frase, html:not(.js) .portada__sub, html:not(.js) .portada__bajar { animation: none; }
+
+/* pausa durante el salto del desfile: corta el impulso del scroll */
+html { scrollbar-gutter: stable; }
+html.pausa, html.pausa body { overflow: hidden; touch-action: none; }
+

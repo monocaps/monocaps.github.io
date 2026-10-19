@@ -140,7 +140,7 @@
       var b = e.target.closest('button');
       if (!b) return;
       medirDesfile();
-      window.scrollTo({ top: df.top + (+b.dataset.i + 0.2) * df.paso, behavior: 'smooth' });
+      if (!df.salto) saltarA(+b.dataset.i);
     });
     new IntersectionObserver(function (ents) {
       if (ents[0].isIntersecting) { medirDesfile(); moverDesfile(); }
@@ -173,6 +173,15 @@
     var esc = $('.desfile__escenario').clientHeight || window.innerHeight;
     df.paso = esc * 0.4;
     df.el.style.height = (esc + df.lista.length * df.paso) + 'px';
+    // un punto de parada por gorra: un deslizamiento avanza una sola gorra (scroll-snap-stop)
+    var paradas = $('[data-df-paradas]');
+    if (paradas.childElementCount !== df.lista.length || paradas.dataset.paso !== String(Math.round(df.paso))) {
+      paradas.dataset.paso = Math.round(df.paso);
+      paradas.innerHTML = df.lista.map(function (g, i) {
+        // +64 compensa el scroll-padding-top de la cabecera
+        return '<span style="top:' + ((i + 0.2) * df.paso + 64).toFixed(1) + 'px"></span>';
+      }).join('');
+    }
     var r = df.el.getBoundingClientRect();
     df.top = r.top + window.scrollY;
     df.zw = df.zona.clientWidth;
@@ -184,11 +193,33 @@
   }
   function moverDesfile() {
     if (!df.lista.length) return;
-    if (df.salto) { df.pendiente = true; return; }
+    var y = window.scrollY, antes = df.antesY == null ? y : df.antesY;
+    df.antesY = y;
+    // navegando con un enlace del menú: el desfile se deja atravesar sin pausas
+    if (df.libre) { if (!df.salto) { df.actual = pasoActual(); pintarCuadro(df.actual, df.actual, 0); } return; }
+    if (df.salto) return;
+    // al entrar bajando con impulso, la primera parada siempre es la gorra 01
+    if (antes < df.top && y > df.top + 0.2 * df.paso + 8 && df.actual === 0) { pausar(df.top + 0.2 * df.paso); return; }
     var k = pasoActual();
     if (k === df.actual) return;
-    df.salto = { de: df.actual, a: k, t0: performance.now() };
+    // un deslizamiento = una gorra, aunque el dedo haya lanzado el scroll más lejos
+    saltarA(df.actual + (k > df.actual ? 1 : -1));
+  }
+  // salta a la gorra i y hace una pausa: corta el impulso del dedo y bloquea el scroll mientras dura el salto
+  function saltarA(i) {
+    i = Math.max(0, Math.min(df.lista.length - 1, i));
+    if (i === df.actual) return;
+    df.salto = { de: df.actual, a: i, t0: performance.now() };
+    pausar(df.top + (i + 0.2) * df.paso);
     requestAnimationFrame(animarSalto);
+  }
+  function pausar(y) {
+    var raiz = document.documentElement;
+    raiz.classList.add('pausa');
+    window.scrollTo({ top: y, behavior: 'instant' });
+    df.antesY = y;
+    clearTimeout(df.desbloqueo);
+    df.desbloqueo = setTimeout(function () { raiz.classList.remove('pausa'); }, DURACION + 80);
   }
   function animarSalto(ahora) {
     var s = df.salto;
@@ -198,7 +229,6 @@
     if (t < 1) { requestAnimationFrame(animarSalto); return; }
     df.actual = s.a;
     df.salto = null;
-    if (df.pendiente) { df.pendiente = false; moverDesfile(); }
   }
 
   function pintarCuadro(de, a, t) {
@@ -669,6 +699,9 @@
     if (href.indexOf('#/') === 0) return;
     e.preventDefault();
     alternarMenu(false);
+    df.libre = true;
+    clearTimeout(df.libreT);
+    df.libreT = setTimeout(function () { df.libre = false; }, 1600);
     if (href === '#') { window.scrollTo({ top: 0, behavior: reducido ? 'auto' : 'smooth' }); return; }
     var destino = $(href);
     if (destino) destino.scrollIntoView({ behavior: reducido ? 'auto' : 'smooth' });
