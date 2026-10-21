@@ -24,39 +24,6 @@
   },
   "gorras": [
     {
-      "id": "fox-racing-azul-oscuro",
-      "nombre": "Fox Racing azul oscuro",
-      "marca": "Fox Racing",
-      "precio": 185000,
-      "tallas": [
-        "S/M"
-      ],
-      "ajuste": "Flexfit",
-      "estado": "disponible",
-      "nueva": false,
-      "nota": "Bordado FOXRACING al frente con «19 74 Trade Mark»; zorro rojo atrás.",
-      "fotos": [
-        {
-          "archivo": "fox-racing-azul-oscuro_frente",
-          "vista": "Frente"
-        },
-        {
-          "archivo": "fox-racing-azul-oscuro_atras",
-          "vista": "Atrás"
-        }
-      ],
-      "fotosReales": [
-        {
-          "archivo": "IMG_0253",
-          "vista": "Frente"
-        },
-        {
-          "archivo": "IMG_0258",
-          "vista": "Atrás"
-        }
-      ]
-    },
-    {
       "id": "hurley-azul-rey",
       "nombre": "Hurley azul rey",
       "marca": "Hurley",
@@ -218,6 +185,39 @@
         }
       ],
       "fotosReales": []
+    },
+    {
+      "id": "fox-racing-azul-oscuro",
+      "nombre": "Fox Racing azul oscuro",
+      "marca": "Fox Racing",
+      "precio": 185000,
+      "tallas": [
+        "S/M"
+      ],
+      "ajuste": "Flexfit",
+      "estado": "encargo",
+      "nueva": false,
+      "nota": "Bordado FOXRACING al frente con «19 74 Trade Mark»; zorro rojo atrás.",
+      "fotos": [
+        {
+          "archivo": "fox-racing-azul-oscuro_frente",
+          "vista": "Frente"
+        },
+        {
+          "archivo": "fox-racing-azul-oscuro_atras",
+          "vista": "Atrás"
+        }
+      ],
+      "fotosReales": [
+        {
+          "archivo": "IMG_0253",
+          "vista": "Frente"
+        },
+        {
+          "archivo": "IMG_0258",
+          "vista": "Atrás"
+        }
+      ]
     },
     {
       "id": "fox-roja",
