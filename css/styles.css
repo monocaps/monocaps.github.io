@@ -660,3 +660,31 @@ html { scrollbar-gutter: stable; }
 html, body { overflow-x: clip; }
 .desfile__flota .sello { right: auto; left: -2%; top: 2%; }
 
+
+/* ---------- inicio: adelanto de la colección ---------- */
+.adelanto {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: center;
+  margin: 34px calc(var(--margen) * -0.5) 0;
+}
+.adelanto__item { position: relative; aspect-ratio: 1; }
+.adelanto__item:nth-child(2) { scale: 1.28; z-index: 2; translate: 0 -8%; }
+.adelanto__item a { position: absolute; inset: 0; display: block; }
+.adelanto__item .flota__gorra { animation-delay: calc(var(--i) * -1.3s); }
+.adelanto__item .sello { width: 46%; border-width: 2px; }
+.js .adelanto__item { opacity: 0; transform: translateY(30px); transition: opacity .8s var(--curva), transform .8s var(--curva); transition-delay: calc(var(--i) * 90ms); }
+.js .coleccion.visible .adelanto__item, .js .adelanto.visible .adelanto__item { opacity: 1; transform: none; }
+.boton-coleccion {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 40px; height: 64px; padding: 0 26px;
+  border-radius: 9999px; background: var(--blanco); color: var(--negro);
+  font: 600 20px/1 var(--cond); letter-spacing: .06em; text-transform: uppercase; text-decoration: none;
+  transition: transform .25s var(--curva);
+}
+.boton-coleccion svg { width: 26px; height: 26px; transition: transform .35s var(--curva); }
+.boton-coleccion:active { transform: scale(.97); }
+.boton-coleccion:active svg { transform: translateX(6px); }
+.coleccion__pista { margin-top: 12px; text-align: center; font-size: 13px; color: var(--humo); }
+@media (min-width: 700px) {
+  .adelanto { max-width: 760px; }
+  .boton-coleccion { max-width: 420px; }
+}

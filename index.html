@@ -27,7 +27,7 @@
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <a class="saltar" href="#coleccion">Saltar a las gorras</a>
+  <a class="saltar" href="coleccion.html">Ir a la colección</a>
 
   <!-- ============ CABECERA ============ -->
   <header class="cabecera">
@@ -40,7 +40,7 @@
   <!-- ============ MENÚ A PANTALLA COMPLETA ============ -->
   <nav class="menu" id="menu" aria-label="Menú" hidden>
     <ol class="menu__lista">
-      <li><a href="#coleccion"><small>01</small>Colección</a></li>
+      <li><a href="coleccion.html"><small>01</small>Colección</a></li>
       <li><a href="#como-comprar"><small>02</small>Cómo comprar</a></li>
       <li><a href="#tallas"><small>03</small>Tallas</a></li>
       <li><a href="#entregas"><small>04</small>Entregas y pagos</a></li>
@@ -80,42 +80,16 @@
       <div class="cinta__pista" data-cinta></div>
     </div>
 
-    <!-- ============ COLECCIÓN ============ -->
+    <!-- ============ COLECCIÓN (adelanto) ============ -->
     <section class="coleccion" id="coleccion">
       <h2 class="titulo-seccion revelar"><span>La</span><span>colección</span></h2>
       <p class="coleccion__resumen" data-resumen></p>
-
-      <div class="filtros" role="group" aria-label="Filtrar gorras">
-        <div class="filtros__fila" data-filtro-marca></div>
-        <div class="filtros__fila" data-filtro-estado></div>
-        <div class="filtros__fila" data-filtro-extra></div>
-      </div>
-
-      <!-- Desfile: una sola burbuja que salta en diagonal al bajar, una gorra a la vez -->
-      <div class="desfile" data-desfile hidden>
-        <div class="desfile__paradas" data-df-paradas aria-hidden="true"></div>
-        <div class="desfile__escenario">
-          <div class="desfile__zona" data-df-zona>
-            <a class="flota desfile__flota" data-df-flota href="#">
-              <canvas class="burbuja" data-burbuja="desfile" aria-hidden="true"></canvas>
-              <img class="flota__gorra" data-df-img alt="">
-              <canvas class="burbuja burbuja--frente" data-burbuja-frente="desfile" aria-hidden="true"></canvas>
-              <span class="sello" data-df-sello hidden aria-hidden="true"><span class="sello__txt"><b>Vendida</b><i>por encargo</i></span></span>
-            </a>
-            <ol class="desfile__indice" data-df-indice aria-label="Ir a una gorra"></ol>
-          </div>
-          <div class="desfile__texto" data-df-texto aria-live="polite">
-            <p class="desfile__num" data-df-num></p>
-            <p class="ceja" data-df-marca></p>
-            <h3 class="desfile__nombre" data-df-nombre></h3>
-            <p class="desfile__meta" data-df-meta></p>
-            <a class="enlace" data-df-ver href="#">Ver gorra →</a>
-          </div>
-        </div>
-      </div>
-
-      <ul class="rejilla" data-rejilla></ul>
-      <p class="rejilla__vacia" data-vacia hidden>No hay gorras con ese filtro.</p>
+      <ul class="adelanto" data-adelanto aria-label="Algunas gorras de la colección"></ul>
+      <a class="boton-coleccion" href="coleccion.html">
+        <span>Ver colección</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+      </a>
+      <p class="coleccion__pista">Desliza de lado para ver cada gorra.</p>
     </section>
 
     <!-- ============ CÓMO COMPRAR ============ -->
@@ -183,73 +157,16 @@
 
   <!-- ============ BOTÓN WHATSAPP GENERAL ============ -->
   <a class="pildora pildora--flotante" data-wa-general href="#" aria-label="Escribir a Mono Caps por WhatsApp">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2l-.5-.3Z"/></svg>
+    <svg data-icono-wa-fuente viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2l-.5-.3Z"/></svg>
     <span>Pedir por WhatsApp</span>
   </a>
 
-  <!-- ============ DETALLE DE GORRA ============ -->
-  <div class="detalle" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="d-nombre" hidden>
-    <div class="detalle__barra">
-      <button class="detalle__cerrar" data-cerrar aria-label="Volver al catálogo">←</button>
-      <span class="detalle__num" data-d-num></span>
-      <button class="detalle__compartir" data-compartir aria-label="Compartir esta gorra">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 13v7h14v-7" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
-      </button>
-    </div>
-    <div class="detalle__scroll">
-      <div class="detalle__pestanas" role="tablist" data-d-pestanas>
-        <button role="tab" aria-selected="true" data-tab="producto">Producto</button>
-        <button role="tab" aria-selected="false" data-tab="real">Así llega</button>
-      </div>
-
-      <div class="detalle__galeria" data-panel="producto">
-        <canvas class="burbuja detalle__burbuja" data-burbuja="detalle" aria-hidden="true"></canvas>
-        <div class="carril" data-d-carril></div>
-        <canvas class="burbuja burbuja--frente detalle__burbuja" data-burbuja-frente="detalle" aria-hidden="true"></canvas>
-        <span class="sello sello--detalle" data-d-sello hidden aria-hidden="true"><span class="sello__txt"><b>Vendida</b><i>por encargo</i></span></span>
-        <p class="carril__indice" data-d-indice></p>
-      </div>
-      <div class="detalle__reales" data-panel="real" hidden>
-        <div class="carril carril--fotos" data-d-reales></div>
-        <p class="carril__indice" data-d-indice-real></p>
-        <p class="nota">Foto real, tomada por Mono en el mirador.</p>
-      </div>
-
-      <div class="detalle__info">
-        <p class="ceja" data-d-marca></p>
-        <h2 class="detalle__nombre" id="d-nombre" data-d-nombre></h2>
-        <p class="detalle__precio" data-d-precio></p>
-        <dl class="ficha">
-          <div><dt>Talla</dt><dd data-d-talla></dd></div>
-          <div><dt>Ajuste</dt><dd data-d-ajuste></dd></div>
-          <div><dt>Estado</dt><dd data-d-estado></dd></div>
-        </dl>
-        <p class="detalle__nota" data-d-nota></p>
-        <details class="plegable">
-          <summary>¿Cuál es mi talla?</summary>
-          <p>S/M: contorno de cabeza de 54 a 57,8 cm. L/XL: de 56,8 a 60,6 cm. Mídete con un metro de costura, un dedo por encima de las cejas.</p>
-        </details>
-        <ul class="detalle__avisos" data-d-avisos></ul>
-      </div>
-    </div>
-    <div class="detalle__accion">
-      <a class="pildora" data-d-wa href="#" target="_blank" rel="noopener">
-        <svg data-icono-wa viewBox="0 0 24 24" aria-hidden="true"></svg>
-        <span data-d-wa-texto>Pedir por WhatsApp</span>
-      </a>
-    </div>
-  </div>
-
-  <!-- ============ VISOR CON ZOOM ============ -->
-  <div class="visor" role="dialog" aria-modal="true" aria-label="Foto ampliada" hidden>
-    <img class="visor__img" alt="">
-    <button class="visor__cerrar" aria-label="Cerrar foto">✕</button>
-    <p class="visor__pista">Pellizca o toca dos veces para ampliar</p>
-  </div>
-
   <div class="aviso-flotante" role="status" aria-live="polite" hidden></div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="js/burbuja.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/comun.js"></script>
+  <script src="js/inicio.js"></script>
 </body>
 </html>

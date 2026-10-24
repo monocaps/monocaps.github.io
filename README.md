@@ -3,18 +3,25 @@
 Catálogo de gorras pensado para celular. Se publica gratis en GitHub Pages y no necesita servidor ni base de datos.
 
 ```
-index.html            la página
-css/styles.css        el diseño
-js/app.js             la lógica (filtros, detalle, WhatsApp, zoom)
-js/burbuja.js         las burbujas de obsidiana (WebGL)
+index.html            inicio: la marca (portada, adelanto, cómo comprar, tallas, entregas)
+coleccion.html        la colección: una gorra a la vez, se pasa deslizando de lado
+css/styles.css        diseño general
+css/coleccion.css     diseño de la colección
+js/comun.js           base de las dos páginas (datos, detalle de gorra, zoom, menú)
+js/inicio.js          lógica del inicio
+js/coleccion.js       lógica de la colección (cambio de gorra, giro, filtros, "Ver todas")
+js/gota.js            la burbuja que se parte como gota (WebGL)
+js/burbuja.js         las burbujas pequeñas (adelanto y detalle)
 data/productos.json   ← TODOS LOS DATOS. Es el único archivo que vas a editar casi siempre
 img/productos/        fotos de producto sin fondo (720 px) y sm/ (400 px)
 img/mirador/          fotos reales del mirador (1200 px y -sm 640 px)
 img/portada/          foto grupal y recorte de la Fox blanca
-fonts/                Anton, Barlow y Barlow Condensed (alojadas aquí para que carguen rápido)
+fonts/                Anton, Barlow y Barlow Condensed
 og.jpg                imagen que sale al compartir el link
 tools/                scripts para procesar fotos (no hacen parte de la página)
 ```
+
+**Link directo a una gorra:** `https://monocaps.github.io/coleccion.html?g=fox-roja` (el `id` de la gorra). En la colección, la parte de atrás que se ve al tocar la gorra es la segunda foto de `"fotos"`.
 
 ---
 
