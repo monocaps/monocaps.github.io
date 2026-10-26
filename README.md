@@ -102,6 +102,12 @@ tools/                scripts para procesar fotos (no hacen parte de la página)
 
 Los scripts necesitan Python con: `pip install pillow "rembg[cpu]"`
 
+### Foto "Así se lleva" (inicio)
+
+La foto está en `img/calle/` (`calle.webp` 1200 px y `calle-sm.webp` 720 px, sin retoques).
+Los puntos que se tocan están en `js/inicio.js`, en la lista `PUNTOS`: cada uno tiene el `id` de la gorra
+y su posición `x`/`y` en porcentaje de la foto. Si cambias la foto, ajusta esos números.
+
 ---
 
 ## 3. Dónde está publicado
@@ -132,6 +138,7 @@ y abre http://localhost:8000
 
 - Usuarios de Instagram y TikTok (`instagram` y `tiktok` en `productos.json`).
 - Fotos reales del mirador de las gorras que vienen en camino, cuando lleguen.
+- Ajuste de las 4 Fox que llegan (camuflada, beige, Racing negra y dorada, Racing gris): hoy dice «Por confirmar».
 
 ## Logo
 

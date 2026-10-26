@@ -688,3 +688,66 @@ html, body { overflow-x: clip; }
   .adelanto { max-width: 760px; }
   .boton-coleccion { max-width: 420px; }
 }
+
+/* ---------- inicio: así se lleva (foto con puntos que llevan a cada gorra) ---------- */
+.calle { padding: var(--seccion) var(--margen) 0; }
+.calle__marco { position: relative; margin: 34px calc(var(--margen) * -1) 0; }
+.calle__ventana { position: relative; overflow: hidden; }
+.calle__lienzo { position: relative; scale: calc(1 + var(--pz, 0) * .09); transform-origin: 50% 40%; will-change: scale; }
+.calle__foto { display: block; width: 100%; height: auto; aspect-ratio: 1200 / 2133; background: #0b0b0d; }
+.calle__puntos { position: absolute; inset: 0; }
+.calle__punto {
+  position: absolute; left: var(--x); top: var(--y);
+  width: 48px; height: 48px; translate: -50% -50%;
+  display: grid; place-items: center; border-radius: 50%;
+}
+.calle__punto::before {
+  content: ""; width: 16px; height: 16px; border-radius: 50%;
+  background: rgba(255,255,255,.9); box-shadow: 0 0 0 4px rgba(0,0,0,.35), 0 2px 10px rgba(0,0,0,.6);
+  transition: scale .3s var(--curva), background .3s;
+}
+.calle__punto::after {
+  content: ""; position: absolute; inset: 8px; border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,.85);
+  animation: onda 2.2s var(--curva) infinite; animation-delay: calc(var(--i) * .35s);
+}
+@keyframes onda { from { scale: .45; opacity: 1; } to { scale: 1.25; opacity: 0; } }
+.calle__punto[aria-pressed="true"]::before { scale: 1.35; background: var(--blanco); box-shadow: 0 0 0 5px rgba(255,255,255,.25), 0 2px 12px rgba(0,0,0,.6); }
+.calle__punto[aria-pressed="true"]::after { animation: none; opacity: 0; }
+
+.calle__ficha {
+  position: absolute; left: 0; right: 0; top: 0; z-index: 2;
+  min-height: 104px; padding: 16px var(--margen) 30px; display: flex; align-items: center;
+  background: linear-gradient(rgba(0,0,0,.82), rgba(0,0,0,.55) 65%, transparent);
+  pointer-events: none;
+}
+.calle__ficha > * { pointer-events: auto; }
+.calle__pista { font: 600 13px/1 var(--cond); letter-spacing: .12em; text-transform: uppercase; color: var(--ceniza); }
+.calle__gorra {
+  display: grid; grid-template-columns: 72px 1fr auto; align-items: center; gap: 14px;
+  width: 100%; color: var(--blanco); text-decoration: none;
+  animation: aparecer .45s var(--curva) both;
+}
+.calle__mini {
+  position: relative; width: 72px; aspect-ratio: 1; border-radius: 50%;
+  background: radial-gradient(circle at 50% 56%, #191a22 0, #08080b 60%, #030304 72%);
+  box-shadow: inset 0 -6px 16px rgba(255,160,70,.2), inset 0 5px 14px rgba(90,150,255,.16), inset 0 0 0 1px rgba(255,255,255,.06);
+}
+.calle__mini img { position: absolute; left: 12%; top: 12%; width: 76%; }
+.calle__datos { display: grid; gap: 7px; min-width: 0; }
+.calle__nombre { font: 600 20px/1.05 var(--cond); text-transform: uppercase; }
+.calle__ver { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; border: 1px solid var(--linea); }
+.calle__ver svg { width: 20px; height: 20px; }
+.calle__gorra:active .calle__mini { scale: .95; }
+
+@media (min-width: 700px) {
+  .calle { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 48px; max-width: 1400px; margin: 0 auto; align-items: end; }
+  .calle .titulo-seccion { grid-column: 1; grid-row: 1; align-self: start; }
+  .calle__marco { grid-column: 2; grid-row: 1 / span 2; margin: 0; width: min(100%, 52svh); justify-self: end; }
+  .calle__ventana { border-radius: 4px; }
+  .calle__ficha { padding-left: 20px; padding-right: 20px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .calle__lienzo { scale: none; }
+  .calle__punto::after { animation: none; opacity: 0; }
+}

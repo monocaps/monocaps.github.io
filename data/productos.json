@@ -115,30 +115,6 @@
       "fotosReales": []
     },
     {
-      "id": "ariat-negra",
-      "nombre": "Ariat negra",
-      "marca": "Ariat",
-      "precio": 185000,
-      "tallas": [
-        "S/M"
-      ],
-      "ajuste": "Flexfit",
-      "estado": "por-llegar",
-      "nueva": true,
-      "nota": "Escudo Ariat negro sobre negro al frente.",
-      "fotos": [
-        {
-          "archivo": "ariat-negra_frente",
-          "vista": "Frente"
-        },
-        {
-          "archivo": "ariat-negra_atras",
-          "vista": "Atrás"
-        }
-      ],
-      "fotosReales": []
-    },
-    {
       "id": "fox-trucker-negra",
       "nombre": "Fox trucker negra",
       "marca": "Fox Racing",
@@ -181,6 +157,126 @@
         },
         {
           "archivo": "fox-gris-claro-speed-division_atras",
+          "vista": "Atrás"
+        }
+      ],
+      "fotosReales": []
+    },
+    {
+      "id": "fox-camuflada-negra",
+      "nombre": "Fox camuflada negra",
+      "marca": "Fox Racing",
+      "precio": 185000,
+      "tallas": [
+        "S/M"
+      ],
+      "ajuste": "",
+      "estado": "por-llegar",
+      "nueva": true,
+      "nota": "Camuflado negro y gris; cabeza de zorro bordada en negro al frente.",
+      "fotos": [
+        {
+          "archivo": "fox-camuflada-negra_frente",
+          "vista": "Frente"
+        },
+        {
+          "archivo": "fox-camuflada-negra_atras",
+          "vista": "Atrás"
+        }
+      ],
+      "fotosReales": []
+    },
+    {
+      "id": "fox-beige",
+      "nombre": "Fox beige",
+      "marca": "Fox Racing",
+      "precio": 185000,
+      "tallas": [
+        "S/M"
+      ],
+      "ajuste": "",
+      "estado": "por-llegar",
+      "nueva": true,
+      "nota": "Cabeza de zorro bordada en blanco con borde negro al frente.",
+      "fotos": [
+        {
+          "archivo": "fox-beige_frente",
+          "vista": "Frente"
+        },
+        {
+          "archivo": "fox-beige_atras",
+          "vista": "Atrás"
+        }
+      ],
+      "fotosReales": []
+    },
+    {
+      "id": "fox-racing-negra-dorada",
+      "nombre": "Fox Racing negra y dorada",
+      "marca": "Fox Racing",
+      "precio": 185000,
+      "tallas": [
+        "S/M"
+      ],
+      "ajuste": "",
+      "estado": "por-llegar",
+      "nueva": true,
+      "nota": "Bordado FOX RACING blanco y dorado con rayos al frente; zorro dorado atrás.",
+      "fotos": [
+        {
+          "archivo": "fox-racing-negra-dorada_frente",
+          "vista": "Frente"
+        },
+        {
+          "archivo": "fox-racing-negra-dorada_atras",
+          "vista": "Atrás"
+        }
+      ],
+      "fotosReales": []
+    },
+    {
+      "id": "fox-racing-gris",
+      "nombre": "Fox Racing gris",
+      "marca": "Fox Racing",
+      "precio": 185000,
+      "tallas": [
+        "S/M"
+      ],
+      "ajuste": "",
+      "estado": "por-llegar",
+      "nueva": true,
+      "nota": "Bordado FOXRACING al frente con «19 74 Trade Mark»; botón negro arriba y zorro negro atrás.",
+      "fotos": [
+        {
+          "archivo": "fox-racing-gris_frente",
+          "vista": "Frente"
+        },
+        {
+          "archivo": "fox-racing-gris_atras",
+          "vista": "Atrás"
+        }
+      ],
+      "fotosReales": []
+    },
+    {
+      "id": "ariat-negra",
+      "nombre": "Ariat negra",
+      "marca": "Ariat",
+      "precio": 185000,
+      "tallas": [
+        "S/M"
+      ],
+      "ajuste": "Flexfit",
+      "estado": "encargo",
+      "nueva": false,
+      "nota": "Escudo Ariat negro sobre negro al frente.",
+      "fotos": [
+        {
+          "archivo": "ariat-negra_frente",
+          "vista": "Frente"
+        },
+        {
+          "archivo": "ariat-negra_atras",
           "vista": "Atrás"
         }
       ],
