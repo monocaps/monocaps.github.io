@@ -58,8 +58,8 @@
       ]
     },
     {
-      "id": "fox-gris-oscuro",
-      "nombre": "Fox gris oscuro",
+      "id": "fox-racing-azul-oscuro",
+      "nombre": "Fox Racing azul oscuro",
       "marca": "Fox Racing",
       "precio": 185000,
       "tallas": [
@@ -68,27 +68,75 @@
       "ajuste": "Flexfit",
       "estado": "disponible",
       "nueva": false,
-      "nota": "Logo FOX grande en gris claro; zorro gris claro atrás.",
+      "nota": "Bordado FOXRACING al frente con «19 74 Trade Mark»; zorro rojo atrás.",
       "fotos": [
         {
-          "archivo": "fox-gris-oscuro_frente",
+          "archivo": "fox-racing-azul-oscuro_frente",
           "vista": "Frente"
         },
         {
-          "archivo": "fox-gris-oscuro_atras",
+          "archivo": "fox-racing-azul-oscuro_atras",
           "vista": "Atrás"
         }
       ],
       "fotosReales": [
         {
-          "archivo": "IMG_0268",
+          "archivo": "IMG_0253",
           "vista": "Frente"
         },
         {
-          "archivo": "IMG_0270",
+          "archivo": "IMG_0258",
           "vista": "Atrás"
         }
       ]
+    },
+    {
+      "id": "fox-negra-logo-blanco",
+      "nombre": "Fox negra logo blanco",
+      "marca": "Fox Racing",
+      "precio": 185000,
+      "tallas": [
+        "S/M"
+      ],
+      "ajuste": "",
+      "estado": "disponible",
+      "nueva": true,
+      "nota": "Zorro y FOX en blanco al frente; laterales y parte de atrás en malla negra.",
+      "fotos": [
+        {
+          "archivo": "fox-negra-logo-blanco_frente",
+          "vista": "Frente"
+        },
+        {
+          "archivo": "fox-negra-logo-blanco_atras",
+          "vista": "Atrás"
+        }
+      ],
+      "fotosReales": []
+    },
+    {
+      "id": "fox-negra-zorro",
+      "nombre": "Fox negra zorro",
+      "marca": "Fox Racing",
+      "precio": 185000,
+      "tallas": [
+        "S/M"
+      ],
+      "ajuste": "",
+      "estado": "disponible",
+      "nueva": true,
+      "nota": "Cabeza de zorro negra con borde blanco bordada al frente; atrás lisa.",
+      "fotos": [
+        {
+          "archivo": "fox-negra-zorro_frente",
+          "vista": "Frente"
+        },
+        {
+          "archivo": "fox-negra-zorro_atras",
+          "vista": "Atrás"
+        }
+      ],
+      "fotosReales": []
     },
     {
       "id": "alpinestars-negra",
@@ -259,6 +307,39 @@
       "fotosReales": []
     },
     {
+      "id": "fox-gris-oscuro",
+      "nombre": "Fox gris oscuro",
+      "marca": "Fox Racing",
+      "precio": 185000,
+      "tallas": [
+        "S/M"
+      ],
+      "ajuste": "Flexfit",
+      "estado": "encargo",
+      "nueva": false,
+      "nota": "Logo FOX grande en gris claro; zorro gris claro atrás.",
+      "fotos": [
+        {
+          "archivo": "fox-gris-oscuro_frente",
+          "vista": "Frente"
+        },
+        {
+          "archivo": "fox-gris-oscuro_atras",
+          "vista": "Atrás"
+        }
+      ],
+      "fotosReales": [
+        {
+          "archivo": "IMG_0268",
+          "vista": "Frente"
+        },
+        {
+          "archivo": "IMG_0270",
+          "vista": "Atrás"
+        }
+      ]
+    },
+    {
       "id": "ariat-negra",
       "nombre": "Ariat negra",
       "marca": "Ariat",
@@ -281,39 +362,6 @@
         }
       ],
       "fotosReales": []
-    },
-    {
-      "id": "fox-racing-azul-oscuro",
-      "nombre": "Fox Racing azul oscuro",
-      "marca": "Fox Racing",
-      "precio": 185000,
-      "tallas": [
-        "S/M"
-      ],
-      "ajuste": "Flexfit",
-      "estado": "encargo",
-      "nueva": false,
-      "nota": "Bordado FOXRACING al frente con «19 74 Trade Mark»; zorro rojo atrás.",
-      "fotos": [
-        {
-          "archivo": "fox-racing-azul-oscuro_frente",
-          "vista": "Frente"
-        },
-        {
-          "archivo": "fox-racing-azul-oscuro_atras",
-          "vista": "Atrás"
-        }
-      ],
-      "fotosReales": [
-        {
-          "archivo": "IMG_0253",
-          "vista": "Frente"
-        },
-        {
-          "archivo": "IMG_0258",
-          "vista": "Atrás"
-        }
-      ]
     },
     {
       "id": "fox-roja",

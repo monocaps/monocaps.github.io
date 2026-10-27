@@ -138,7 +138,7 @@ y abre http://localhost:8000
 
 - Usuarios de Instagram y TikTok (`instagram` y `tiktok` en `productos.json`).
 - Fotos reales del mirador de las gorras que vienen en camino, cuando lleguen.
-- Ajuste de las 4 Fox que llegan (camuflada, beige, Racing negra y dorada, Racing gris): hoy dice «Por confirmar».
+- Ajuste de las 6 Fox nuevas (camuflada, beige, Racing negra y dorada, Racing gris, negra logo blanco, negra zorro): hoy dice «Por confirmar».
 
 ## Logo
 
