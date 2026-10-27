@@ -91,6 +91,30 @@
       ]
     },
     {
+      "id": "fox-negra-malla",
+      "nombre": "Fox negra de malla",
+      "marca": "Fox Racing",
+      "precio": 185000,
+      "tallas": [
+        "S/M"
+      ],
+      "ajuste": "Flexfit",
+      "estado": "disponible",
+      "nueva": false,
+      "nota": "Tela de malla; zorro negro al frente.",
+      "fotos": [
+        {
+          "archivo": "fox-negra-zorro-negro_frente",
+          "vista": "Frente"
+        },
+        {
+          "archivo": "fox-negra-zorro-negro_atras",
+          "vista": "Atrás"
+        }
+      ],
+      "fotosReales": []
+    },
+    {
       "id": "fox-negra-logo-blanco",
       "nombre": "Fox negra logo blanco",
       "marca": "Fox Racing",
@@ -211,30 +235,6 @@
       "fotosReales": []
     },
     {
-      "id": "fox-camuflada-negra",
-      "nombre": "Fox camuflada negra",
-      "marca": "Fox Racing",
-      "precio": 185000,
-      "tallas": [
-        "S/M"
-      ],
-      "ajuste": "Flexfit",
-      "estado": "por-llegar",
-      "nueva": true,
-      "nota": "Camuflado negro y gris; cabeza de zorro bordada en negro al frente.",
-      "fotos": [
-        {
-          "archivo": "fox-camuflada-negra_frente",
-          "vista": "Frente"
-        },
-        {
-          "archivo": "fox-camuflada-negra_atras",
-          "vista": "Atrás"
-        }
-      ],
-      "fotosReales": []
-    },
-    {
       "id": "fox-beige",
       "nombre": "Fox beige",
       "marca": "Fox Racing",
@@ -301,6 +301,30 @@
         },
         {
           "archivo": "fox-racing-gris_atras",
+          "vista": "Atrás"
+        }
+      ],
+      "fotosReales": []
+    },
+    {
+      "id": "fox-camuflada-negra",
+      "nombre": "Fox camuflada negra",
+      "marca": "Fox Racing",
+      "precio": 185000,
+      "tallas": [
+        "S/M"
+      ],
+      "ajuste": "Flexfit",
+      "estado": "encargo",
+      "nueva": false,
+      "nota": "Camuflado negro y gris; cabeza de zorro bordada en negro al frente.",
+      "fotos": [
+        {
+          "archivo": "fox-camuflada-negra_frente",
+          "vista": "Frente"
+        },
+        {
+          "archivo": "fox-camuflada-negra_atras",
           "vista": "Atrás"
         }
       ],
@@ -457,30 +481,6 @@
           "vista": "Atrás"
         }
       ]
-    },
-    {
-      "id": "fox-negra-malla",
-      "nombre": "Fox negra de malla",
-      "marca": "Fox Racing",
-      "precio": 185000,
-      "tallas": [
-        "S/M"
-      ],
-      "ajuste": "Flexfit",
-      "estado": "encargo",
-      "nueva": false,
-      "nota": "Tela de malla; zorro negro al frente.",
-      "fotos": [
-        {
-          "archivo": "fox-negra-zorro-negro_frente",
-          "vista": "Frente"
-        },
-        {
-          "archivo": "fox-negra-zorro-negro_atras",
-          "vista": "Atrás"
-        }
-      ],
-      "fotosReales": []
     }
   ]
 }
